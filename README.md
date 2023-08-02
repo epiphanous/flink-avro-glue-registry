@@ -53,6 +53,7 @@ CREATE TABLE user_created (
 
 | Option                                  | Required | Forwarded |      Default       |  Type   | Description                                                     |
 |-----------------------------------------|:--------:|:---------:|:------------------:|:-------:|-----------------------------------------------------------------|
+| format                                  |   yes    |    no     |                    | string  | must be `avro-glue`                                             |
 | avro-glue.transport.name                |    no    |    yes    |                    | string  | computed from table name                                        |
 | avro-glue.region                        |   yes    |    yes    |                    | string  |                                                                 |
 | avro-glue.endpoint                      |    no    |    yes    |                    | string  | inferred from region                                            |
