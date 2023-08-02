@@ -6,8 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="afc92327-c142-4d30-ac2c-2aac056e4a41" name="Changes" comment="initial commit">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/io/epiphanous/flink/formats/avro/registry/glue/AvroGlueFormatFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/epiphanous/flink/formats/avro/registry/glue/AvroGlueFormatFactory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/io/epiphanous/flink/formats/avro/registry/glue/AvroGlueFormatOptions.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/epiphanous/flink/formats/avro/registry/glue/AvroGlueFormatOptions.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/io/epiphanous/flink/formats/avro/registry/glue/GlueAvroCoderProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/epiphanous/flink/formats/avro/registry/glue/GlueAvroCoderProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/io/epiphanous/flink/formats/avro/registry/glue/AvroGlueFormatFactoryTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/io/epiphanous/flink/formats/avro/registry/glue/AvroGlueFormatFactoryTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -72,7 +75,7 @@
       <recent name="io.epiphanous.flink.formats.avro.registry.glue" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.AvroGlueFormatOptionsTest.dotCase">
+  <component name="RunManager" selected="JUnit.AvroGlueFormatFactoryTest.testSerializationSchema">
     <configuration name="AvroGlueFormatFactoryTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="flink-avro-glue-registry" />
       <extension name="coverage">
@@ -154,11 +157,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.AvroGlueFormatFactoryTest.testSerializationSchema" />
+        <item itemvalue="JUnit.AvroGlueFormatFactoryTest.testDeserializationSchema" />
+        <item itemvalue="JUnit.AvroGlueFormatFactoryTest" />
         <item itemvalue="JUnit.AvroGlueFormatOptionsTest.dotCase" />
         <item itemvalue="JUnit.GlueAvroCoderProviderTest.testEquals" />
-        <item itemvalue="JUnit.AvroGlueFormatFactoryTest" />
-        <item itemvalue="JUnit.AvroGlueFormatFactoryTest.testDeserializationSchema" />
-        <item itemvalue="JUnit.AvroGlueFormatFactoryTest.testSerializationSchema" />
       </list>
     </recent_temporary>
   </component>
@@ -197,7 +200,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/io/epiphanous/flink/formats/avro/registry/glue/GlueAvroCoderProvider.java</url>
-          <line>37</line>
+          <line>40</line>
           <option name="timeStamp" value="4" />
         </line-breakpoint>
         <line-breakpoint type="java-line">
@@ -212,17 +215,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/test/java/io/epiphanous/flink/formats/avro/registry/glue/AvroGlueFormatFactoryTest.java</url>
-          <line>92</line>
+          <line>98</line>
           <option name="timeStamp" value="13" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/test/java/io/epiphanous/flink/formats/avro/registry/glue/AvroGlueFormatFactoryTest.java</url>
-          <line>100</line>
-          <option name="timeStamp" value="14" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/test/java/io/epiphanous/flink/formats/avro/registry/glue/AvroGlueFormatFactoryTest.java</url>
-          <line>112</line>
+          <line>119</line>
           <option name="timeStamp" value="15" />
         </line-breakpoint>
       </breakpoints>

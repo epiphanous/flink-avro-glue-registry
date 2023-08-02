@@ -12,6 +12,9 @@ import org.apache.flink.formats.avro.SchemaCoder;
  */
 public class GlueAvroCoderProvider implements SchemaCoder.SchemaCoderProvider {
 
+  private static final long serialVersionUID = 7177175572100118398L;
+
+
   protected final String transportName;
   protected final Map<String, Object> configs;
 

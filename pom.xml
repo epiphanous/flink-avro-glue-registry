@@ -12,6 +12,8 @@
         <maven.plugin.validation>brief</maven.plugin.validation>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <flink.version>1.17.1</flink.version>
+        <flink.minor.version>1.17</flink.minor.version>
+        <kafka.connector.version>3.0.0</kafka.connector.version>
         <glue.version>1.1.16</glue.version>
         <junit.version>5.10.0</junit.version>
         <surefire.version>3.1.2</surefire.version>
@@ -67,10 +69,15 @@
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-table-common</artifactId>
+            <artifactId>flink-table-api-java</artifactId>
             <version>${flink.version}</version>
             <scope>provided</scope>
-            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-kafka</artifactId>
+            <version>${flink.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>

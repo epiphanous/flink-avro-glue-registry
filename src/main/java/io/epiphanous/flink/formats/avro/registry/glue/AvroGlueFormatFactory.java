@@ -26,6 +26,8 @@ import org.apache.flink.table.factories.FactoryUtil;
 import org.apache.flink.table.factories.SerializationFormatFactory;
 import org.apache.flink.table.types.DataType;
 import org.apache.flink.table.types.logical.RowType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Table format factory for providing configured instances of Glue Schema Avro Registry to RowData
@@ -34,6 +36,8 @@ import org.apache.flink.table.types.logical.RowType;
 public class AvroGlueFormatFactory
     implements DeserializationFormatFactory, SerializationFormatFactory {
 
+  private static final Logger LOG = LoggerFactory.getLogger(AvroGlueFormatFactory.class);
+
   public static final String IDENTIFIER = "avro-glue";
 
   @Override
@@ -41,7 +45,11 @@ public class AvroGlueFormatFactory
       DynamicTableFactory.Context context, ReadableConfig formatOptions) {
     FactoryUtil.validateFactoryOptions(this, formatOptions);
 
+    String schemaName = formatOptions.get(SCHEMA_NAME);
+
     Map<String, Object> configs = buildConfigs(formatOptions);
+
+    LOG.debug("createDecodingFormat() with schemaName {} and configs {}", schemaName, configs);
 
     return new ProjectableDecodingFormat<DeserializationSchema<RowData>>() {
       @Override
@@ -53,7 +61,7 @@ public class AvroGlueFormatFactory
             context.createTypeInformation(producedDataType);
         return new AvroRowDataDeserializationSchema(
             GlueAvroDeserializationSchema.forGeneric(
-                AvroSchemaConverter.convertToSchema(rowType), configs),
+                AvroSchemaConverter.convertToSchema(rowType, schemaName), configs),
             AvroToRowDataConverters.createRowConverter(rowType),
             rowDataTypeInfo);
       }
@@ -70,11 +78,21 @@ public class AvroGlueFormatFactory
       DynamicTableFactory.Context context, ReadableConfig formatOptions) {
     FactoryUtil.validateFactoryOptions(this, formatOptions);
 
-    String transportName =
-        formatOptions
-            .getOptional(TRANSPORT_NAME)
-            .orElse(context.getObjectIdentifier().asSerializableString());
+    String topic =
+        context
+            .getConfiguration()
+            .getOptional(KAFKA_TOPIC)
+            .orElse(formatOptions.getOptional(KAFKA_TOPIC).orElse("unknown"));
+
+    String schemaName = formatOptions.get(SCHEMA_NAME);
+
     Map<String, Object> configs = buildConfigs(formatOptions);
+
+    LOG.debug(
+        "createEncodingFormat() with topic {}, schemaName {} and configs {}",
+        topic,
+        schemaName,
+        configs);
 
     return new EncodingFormat<SerializationSchema<RowData>>() {
       @Override
@@ -84,7 +102,7 @@ public class AvroGlueFormatFactory
         return new AvroRowDataSerializationSchema(
             rowType,
             GlueAvroSerializationSchema.forGeneric(
-                AvroSchemaConverter.convertToSchema(rowType), transportName, configs),
+                AvroSchemaConverter.convertToSchema(rowType, schemaName), topic, configs),
             RowDataToAvroConverters.createConverter(rowType));
       }
 
@@ -103,17 +121,17 @@ public class AvroGlueFormatFactory
   @Override
   public Set<ConfigOption<?>> requiredOptions() {
     Set<ConfigOption<?>> options = new HashSet<>();
-    options.add(AWS_REGION);
+    options.add(SCHEMA_NAME);
     return options;
   }
 
   @Override
   public Set<ConfigOption<?>> optionalOptions() {
     Set<ConfigOption<?>> options = new HashSet<>();
+    options.add(KAFKA_TOPIC);
     options.add(PROPERTIES);
-    options.add(TRANSPORT_NAME);
-    options.add(SCHEMA_NAME);
     options.add(REGISTRY_NAME);
+    options.add(AWS_REGION);
     options.add(AWS_ENDPOINT);
     options.add(SCHEMA_AUTO_REGISTRATION_SETTING);
     options.add(SCHEMA_NAMING_GENERATION_CLASS);
@@ -126,7 +144,6 @@ public class AvroGlueFormatFactory
     Set<ConfigOption<?>> options = new HashSet<>();
     options.add(REGISTRY_NAME);
     options.add(PROPERTIES);
-    options.add(TRANSPORT_NAME);
     options.add(SCHEMA_NAME);
     options.add(AWS_REGION);
     options.add(AWS_ENDPOINT);
@@ -141,11 +158,10 @@ public class AvroGlueFormatFactory
   private Map<String, Object> buildConfigs(ReadableConfig formatOptions) {
     HashMap<String, Object> configs = new HashMap<>();
     configs.put(AWS_REGION.key(), formatOptions.get(AWS_REGION));
+    configs.put(SCHEMA_NAME.key(), formatOptions.get(SCHEMA_NAME));
     formatOptions.getOptional(PROPERTIES).ifPresent(configs::putAll);
     formatOptions.getOptional(AWS_ENDPOINT).ifPresent(v -> configs.put(AWS_ENDPOINT.key(), v));
     formatOptions.getOptional(REGISTRY_NAME).ifPresent(v -> configs.put(REGISTRY_NAME.key(), v));
-    formatOptions.getOptional(TRANSPORT_NAME).ifPresent(v -> configs.put(TRANSPORT_NAME.key(), v));
-    formatOptions.getOptional(SCHEMA_NAME).ifPresent(v -> configs.put(SCHEMA_NAME.key(), v));
     formatOptions
         .getOptional(SCHEMA_AUTO_REGISTRATION_SETTING)
         .ifPresent(v -> configs.put(SCHEMA_AUTO_REGISTRATION_SETTING.key(), v));

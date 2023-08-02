@@ -4,11 +4,12 @@ import com.amazonaws.services.schemaregistry.utils.AWSSchemaRegistryConstants;
 import java.util.Map;
 import org.apache.flink.configuration.ConfigOption;
 import org.apache.flink.configuration.ConfigOptions;
+import software.amazon.awssdk.regions.Region;
 
 /** Options for Glue Schema Registry Avro format. */
 public class AvroGlueFormatOptions {
 
-   static String dotCase(String name) {
+  static String dotCase(String name) {
     return name.replaceAll(
             String.format(
                 "%s|%s|%s",
@@ -17,19 +18,30 @@ public class AvroGlueFormatOptions {
         .toLowerCase();
   }
 
-  public static final ConfigOption<String> TRANSPORT_NAME =
-      ConfigOptions.key("transport.name")
+  public static final ConfigOption<String> KAFKA_TOPIC =
+      ConfigOptions.key("topic")
           .stringType()
           .noDefaultValue()
           .withDescription(
-              "The name of the message transport (for Kafka, the topic). Normally inferred from the table identifier.");
+              "This is not used as a config for the format, but to pull in the table kafka connector topic configuration.");
+
+  public static final ConfigOption<String> SCHEMA_NAME =
+      ConfigOptions.key(AWSSchemaRegistryConstants.SCHEMA_NAME)
+          .stringType()
+          .noDefaultValue()
+          .withFallbackKeys(
+              dotCase(AWSSchemaRegistryConstants.SCHEMA_NAME),
+              "schema.registry." + AWSSchemaRegistryConstants.SCHEMA_NAME,
+              "schema.registry." + dotCase(AWSSchemaRegistryConstants.SCHEMA_NAME))
+          .withDescription("The schema name to register the schema under.");
 
   public static final ConfigOption<String> AWS_REGION =
       ConfigOptions.key(AWSSchemaRegistryConstants.AWS_REGION)
           .stringType()
-          .noDefaultValue()
+          .defaultValue(Region.US_EAST_1.toString())
           .withFallbackKeys("aws.region")
-          .withDescription("The AWS Region your Glue schema registry operates in.");
+          .withDescription(
+              "The AWS Region your Glue schema registry operates in (defaults to us-east-1).");
 
   public static final ConfigOption<String> AWS_ENDPOINT =
       ConfigOptions.key(AWSSchemaRegistryConstants.AWS_ENDPOINT)
@@ -65,18 +77,6 @@ public class AvroGlueFormatOptions {
           .withDescription(
               "If true, schemas missing from the registry will be "
                   + "auto-registered on serialization. Default is false.");
-
-  public static final ConfigOption<String> SCHEMA_NAME =
-      ConfigOptions.key(AWSSchemaRegistryConstants.SCHEMA_NAME)
-          .stringType()
-          .noDefaultValue()
-          .withFallbackKeys(
-              dotCase(AWSSchemaRegistryConstants.SCHEMA_NAME),
-              "schema.registry." + AWSSchemaRegistryConstants.SCHEMA_NAME,
-              "schema.registry." + dotCase(AWSSchemaRegistryConstants.SCHEMA_NAME))
-          .withDescription(
-              "The schema name to register the schema under. If not "
-                  + "provide, defaults to the transport name (topic name for Kafka).");
 
   public static final ConfigOption<String> SCHEMA_NAMING_GENERATION_CLASS =
       ConfigOptions.key(AWSSchemaRegistryConstants.SCHEMA_NAMING_GENERATION_CLASS)

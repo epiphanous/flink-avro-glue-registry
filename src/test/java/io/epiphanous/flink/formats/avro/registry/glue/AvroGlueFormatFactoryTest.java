@@ -1,12 +1,13 @@
 package io.epiphanous.flink.formats.avro.registry.glue;
 
 import static io.epiphanous.flink.formats.avro.registry.glue.AvroGlueFormatOptions.AWS_REGION;
-import static io.epiphanous.flink.formats.avro.registry.glue.AvroGlueFormatOptions.TRANSPORT_NAME;
+import static io.epiphanous.flink.formats.avro.registry.glue.AvroGlueFormatOptions.SCHEMA_NAME;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
 import javax.validation.constraints.NotNull;
+import org.apache.avro.Schema;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.api.common.serialization.SerializationSchema;
 import org.apache.flink.configuration.ConfigOption;
@@ -40,6 +41,7 @@ class AvroGlueFormatFactoryTest {
   private static final String SCHEMA_STRING =
       "{\n"
           + "  \"type\": \"record\",\n"
+          + "  \"namespace\": \"my.avro\",\n"
           + "  \"name\": \"test_record\",\n"
           + "  \"fields\": [\n"
           + "    {\n"
@@ -69,14 +71,18 @@ class AvroGlueFormatFactoryTest {
           + "  ]\n"
           + "}\n";
 
+  private static final Schema AVRO_SCHEMA = new Schema.Parser().parse(SCHEMA_STRING);
+
+  private static final String MY_SCHEMA_NAME = AVRO_SCHEMA.getFullName();
+  
   private static final Map<String, String> EXPECTED_OPTIONAL_PROPERTIES = new HashMap<>();
 
   @Test
   void testDeserializationSchema() {
 
     Map<String, Object> configs = new HashMap<>();
-    configs.put(AWS_REGION.key(), "us-east-1");
-    configs.put(TRANSPORT_NAME.key(), "transport");
+    configs.put(SCHEMA_NAME.key(), MY_SCHEMA_NAME);
+    configs.put(AWS_REGION.key(), AWS_REGION.defaultValue());
 
     final AvroRowDataDeserializationSchema expectedDeser = getDeserializer(configs);
     final DynamicTableSource actualSource =
@@ -96,9 +102,10 @@ class AvroGlueFormatFactoryTest {
   @Test
   void testSerializationSchema() {
     Map<String, Object> configs = new HashMap<>();
-    configs.put(AWS_REGION.key(), "us-east-1");
-    configs.put(TRANSPORT_NAME.key(), "transport");
-    final AvroRowDataSerializationSchema expectedSer = getSerializer("transport", configs);
+    configs.put(SCHEMA_NAME.key(), MY_SCHEMA_NAME);
+    configs.put(AWS_REGION.key(), AWS_REGION.defaultValue());
+
+    final AvroRowDataSerializationSchema expectedSer = getSerializer( "test-topic", configs);
 
     final DynamicTableSink actualSink = FactoryMocks.createTableSink(SCHEMA, getDefaultOptions());
 
@@ -120,13 +127,11 @@ class AvroGlueFormatFactoryTest {
     options.put("target", "MyTarget");
     options.put("buffer-size", "1000");
     options.put("format", AvroGlueFormatFactory.IDENTIFIER);
-    options.put("avro-glue.region", "us-east-1");
-    options.put("avro-glue.transport.name", "transport");
+    options.put("avro-glue.topic", "test-topic");
+    options.put("avro-glue.schema.name", MY_SCHEMA_NAME);
     return options;
   }
 
-  @Test
-  void createEncodingFormat() {}
 
   @Test
   void factoryIdentifier() {
@@ -159,14 +164,14 @@ class AvroGlueFormatFactoryTest {
     return new AvroRowDataSerializationSchema(
         ROW_TYPE,
         GlueAvroSerializationSchema.forGeneric(
-            AvroSchemaConverter.convertToSchema(ROW_TYPE), transportName, configs),
+            AvroSchemaConverter.convertToSchema(ROW_TYPE, MY_SCHEMA_NAME), transportName, configs),
         RowDataToAvroConverters.createConverter(ROW_TYPE));
   }
 
   AvroRowDataDeserializationSchema getDeserializer(Map<String, Object> configs) {
     return new AvroRowDataDeserializationSchema(
         GlueAvroDeserializationSchema.forGeneric(
-            AvroSchemaConverter.convertToSchema(ROW_TYPE), configs),
+            AvroSchemaConverter.convertToSchema(ROW_TYPE, MY_SCHEMA_NAME), configs),
         AvroToRowDataConverters.createRowConverter(ROW_TYPE),
         InternalTypeInfo.of(ROW_TYPE));
   }
