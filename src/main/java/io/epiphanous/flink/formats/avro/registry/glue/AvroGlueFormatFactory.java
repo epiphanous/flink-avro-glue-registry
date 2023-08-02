@@ -12,6 +12,7 @@ import org.apache.flink.configuration.ConfigOption;
 import org.apache.flink.configuration.ReadableConfig;
 import org.apache.flink.formats.avro.*;
 import org.apache.flink.formats.avro.typeutils.AvroSchemaConverter;
+import org.apache.flink.table.api.ValidationException;
 import org.apache.flink.table.connector.ChangelogMode;
 import org.apache.flink.table.connector.Projection;
 import org.apache.flink.table.connector.format.DecodingFormat;
@@ -40,9 +41,12 @@ public class AvroGlueFormatFactory
 
   public static final String IDENTIFIER = "avro-glue";
 
+  private static final String MISSING_TOPIC = "__missing_topic__";
+
   @Override
   public DecodingFormat<DeserializationSchema<RowData>> createDecodingFormat(
       DynamicTableFactory.Context context, ReadableConfig formatOptions) {
+
     FactoryUtil.validateFactoryOptions(this, formatOptions);
 
     String schemaName = formatOptions.get(SCHEMA_NAME);
@@ -76,13 +80,21 @@ public class AvroGlueFormatFactory
   @Override
   public EncodingFormat<SerializationSchema<RowData>> createEncodingFormat(
       DynamicTableFactory.Context context, ReadableConfig formatOptions) {
+
     FactoryUtil.validateFactoryOptions(this, formatOptions);
 
     String topic =
         context
             .getConfiguration()
             .getOptional(KAFKA_TOPIC)
-            .orElse(formatOptions.getOptional(KAFKA_TOPIC).orElse("unknown"));
+            .orElse(formatOptions.getOptional(KAFKA_TOPIC).orElse(MISSING_TOPIC));
+
+    if (topic.equals(MISSING_TOPIC)) {
+      throw new ValidationException(
+          String.format(
+              "Kafka topic not found among %s options",
+              context.getObjectIdentifier().asSummaryString()));
+    }
 
     String schemaName = formatOptions.get(SCHEMA_NAME);
 

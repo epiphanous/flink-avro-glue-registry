@@ -1,9 +1,8 @@
 package io.epiphanous.flink.formats.avro.registry.glue;
 
-import static io.epiphanous.flink.formats.avro.registry.glue.AvroGlueFormatOptions.AWS_REGION;
-import static io.epiphanous.flink.formats.avro.registry.glue.AvroGlueFormatOptions.SCHEMA_NAME;
+import static io.epiphanous.flink.formats.avro.registry.glue.AvroGlueFormatFactory.IDENTIFIER;
+import static io.epiphanous.flink.formats.avro.registry.glue.AvroGlueFormatOptions.*;
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
 import javax.validation.constraints.NotNull;
@@ -14,6 +13,7 @@ import org.apache.flink.configuration.ConfigOption;
 import org.apache.flink.formats.avro.*;
 import org.apache.flink.formats.avro.typeutils.AvroSchemaConverter;
 import org.apache.flink.table.api.DataTypes;
+import org.apache.flink.table.api.ValidationException;
 import org.apache.flink.table.catalog.Column;
 import org.apache.flink.table.catalog.ResolvedSchema;
 import org.apache.flink.table.connector.sink.DynamicTableSink;
@@ -25,11 +25,13 @@ import org.apache.flink.table.runtime.connector.source.ScanRuntimeProviderContex
 import org.apache.flink.table.runtime.typeutils.InternalTypeInfo;
 import org.apache.flink.table.types.logical.RowType;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Tests for the {@link AvroGlueFormatFactory}. */
 class AvroGlueFormatFactoryTest {
 
-  //  final static Logger logger = LoggerFactory.getLogger(AvroGlueFormatFactoryTest.class);
+  static final Logger logger = LoggerFactory.getLogger(AvroGlueFormatFactoryTest.class);
 
   private static final ResolvedSchema SCHEMA =
       ResolvedSchema.of(
@@ -121,28 +123,43 @@ class AvroGlueFormatFactoryTest {
   }
 
   @Test
+  void testMissingSchemaName() {
+    Map<String, String> options = getDefaultOptions();
+    options.remove(IDENTIFIER + "." + SCHEMA_NAME.key());
+    assertThatThrownBy(() -> FactoryMocks.createTableSink(SCHEMA, options))
+        .isInstanceOf(ValidationException.class);
+  }
+
+  @Test
+  void testMissingTopicName() {
+    Map<String, String> options = getDefaultOptions();
+    options.remove(IDENTIFIER + "." + KAFKA_TOPIC.key());
+    assertThatThrownBy(() -> FactoryMocks.createTableSink(SCHEMA, options))
+        .isInstanceOf(ValidationException.class)
+        .hasStackTraceContaining("Kafka topic not found among");
+  }
+
+  @Test
   void factoryIdentifier() {
-    assertThat(getFactory().factoryIdentifier()).isEqualTo(AvroGlueFormatFactory.IDENTIFIER);
+    assertThat(getFactory().factoryIdentifier()).isEqualTo(IDENTIFIER);
   }
 
   @Test
-  void requiredOptions() {
+  void testRequiredOptions() {
     Set<ConfigOption<?>> options = getFactory().requiredOptions();
-    assertThat(options).hasSize(1);
-    assertThat(options).contains(SCHEMA_NAME);
+    assertThat(options).hasSize(1).contains(SCHEMA_NAME);
   }
 
   @Test
-  void optionalOptions() {
+  void testOptionalOptions() {
     Set<ConfigOption<?>> options = getFactory().optionalOptions();
-    assertThat(options).hasSize(8);
-    assertThat(options).doesNotContain(SCHEMA_NAME);
+    assertThat(options).hasSize(8).doesNotContain(SCHEMA_NAME);
   }
 
   @Test
-  void forwardOptions() {
+  void testForwardOptions() {
     Set<ConfigOption<?>> options = getFactory().forwardOptions();
-    assertThat(options).hasSize(8);
+    assertThat(options).hasSize(8).doesNotContain(KAFKA_TOPIC);
   }
 
   // test utils
@@ -153,9 +170,9 @@ class AvroGlueFormatFactoryTest {
     options.put("connector", TestDynamicTableFactory.IDENTIFIER);
     options.put("target", "MyTarget");
     options.put("buffer-size", "1000");
-    options.put("format", AvroGlueFormatFactory.IDENTIFIER);
+    options.put("format", IDENTIFIER);
     options.put("avro-glue.topic", "test-topic");
-    options.put("avro-glue.schema.name", MY_SCHEMA_NAME);
+    options.put("avro-glue.schemaName", MY_SCHEMA_NAME);
     return options;
   }
 
