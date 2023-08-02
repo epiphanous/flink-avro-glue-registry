@@ -6,10 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="afc92327-c142-4d30-ac2c-2aac056e4a41" name="Changes" comment="initial commit">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/io/epiphanous/flink/formats/avro/registry/glue/AvroGlueFormatFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/epiphanous/flink/formats/avro/registry/glue/AvroGlueFormatFactory.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/io/epiphanous/flink/formats/avro/registry/glue/AvroGlueFormatOptions.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/epiphanous/flink/formats/avro/registry/glue/AvroGlueFormatOptions.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/io/epiphanous/flink/formats/avro/registry/glue/GlueAvroCoderProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/epiphanous/flink/formats/avro/registry/glue/GlueAvroCoderProvider.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/java/io/epiphanous/flink/formats/avro/registry/glue/AvroGlueFormatFactoryTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/io/epiphanous/flink/formats/avro/registry/glue/AvroGlueFormatFactoryTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -75,7 +73,7 @@
       <recent name="io.epiphanous.flink.formats.avro.registry.glue" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.AvroGlueFormatFactoryTest.testSerializationSchema">
+  <component name="RunManager" selected="JUnit.AvroGlueFormatFactoryTest">
     <configuration name="AvroGlueFormatFactoryTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="flink-avro-glue-registry" />
       <extension name="coverage">
@@ -91,7 +89,7 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="AvroGlueFormatFactoryTest.testDeserializationSchema" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="AvroGlueFormatFactoryTest.factoryIdentifier" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="flink-avro-glue-registry" />
       <extension name="coverage">
         <pattern>
@@ -101,13 +99,13 @@
       </extension>
       <option name="PACKAGE_NAME" value="io.epiphanous.flink.formats.avro.registry.glue" />
       <option name="MAIN_CLASS_NAME" value="io.epiphanous.flink.formats.avro.registry.glue.AvroGlueFormatFactoryTest" />
-      <option name="METHOD_NAME" value="testDeserializationSchema" />
+      <option name="METHOD_NAME" value="factoryIdentifier" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="AvroGlueFormatFactoryTest.testSerializationSchema" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="AvroGlueFormatFactoryTest.forwardOptions" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="flink-avro-glue-registry" />
       <extension name="coverage">
         <pattern>
@@ -117,13 +115,13 @@
       </extension>
       <option name="PACKAGE_NAME" value="io.epiphanous.flink.formats.avro.registry.glue" />
       <option name="MAIN_CLASS_NAME" value="io.epiphanous.flink.formats.avro.registry.glue.AvroGlueFormatFactoryTest" />
-      <option name="METHOD_NAME" value="testSerializationSchema" />
+      <option name="METHOD_NAME" value="forwardOptions" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="AvroGlueFormatOptionsTest.dotCase" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="AvroGlueFormatFactoryTest.optionalOptions" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="flink-avro-glue-registry" />
       <extension name="coverage">
         <pattern>
@@ -132,14 +130,14 @@
         </pattern>
       </extension>
       <option name="PACKAGE_NAME" value="io.epiphanous.flink.formats.avro.registry.glue" />
-      <option name="MAIN_CLASS_NAME" value="io.epiphanous.flink.formats.avro.registry.glue.AvroGlueFormatOptionsTest" />
-      <option name="METHOD_NAME" value="dotCase" />
+      <option name="MAIN_CLASS_NAME" value="io.epiphanous.flink.formats.avro.registry.glue.AvroGlueFormatFactoryTest" />
+      <option name="METHOD_NAME" value="optionalOptions" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="GlueAvroCoderProviderTest.testEquals" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="AvroGlueFormatFactoryTest.requiredOptions" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="flink-avro-glue-registry" />
       <extension name="coverage">
         <pattern>
@@ -148,8 +146,8 @@
         </pattern>
       </extension>
       <option name="PACKAGE_NAME" value="io.epiphanous.flink.formats.avro.registry.glue" />
-      <option name="MAIN_CLASS_NAME" value="io.epiphanous.flink.formats.avro.registry.glue.GlueAvroCoderProviderTest" />
-      <option name="METHOD_NAME" value="testEquals" />
+      <option name="MAIN_CLASS_NAME" value="io.epiphanous.flink.formats.avro.registry.glue.AvroGlueFormatFactoryTest" />
+      <option name="METHOD_NAME" value="requiredOptions" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -157,11 +155,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.AvroGlueFormatFactoryTest.testSerializationSchema" />
-        <item itemvalue="JUnit.AvroGlueFormatFactoryTest.testDeserializationSchema" />
         <item itemvalue="JUnit.AvroGlueFormatFactoryTest" />
-        <item itemvalue="JUnit.AvroGlueFormatOptionsTest.dotCase" />
-        <item itemvalue="JUnit.GlueAvroCoderProviderTest.testEquals" />
+        <item itemvalue="JUnit.AvroGlueFormatFactoryTest.factoryIdentifier" />
+        <item itemvalue="JUnit.AvroGlueFormatFactoryTest.requiredOptions" />
+        <item itemvalue="JUnit.AvroGlueFormatFactoryTest.forwardOptions" />
+        <item itemvalue="JUnit.AvroGlueFormatFactoryTest.optionalOptions" />
       </list>
     </recent_temporary>
   </component>

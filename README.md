@@ -51,18 +51,17 @@ CREATE TABLE user_created (
 
 ## Format Options
 
-| Option                                  | Required | Forwarded |      Default       |  Type   | Description                                                     |
-|-----------------------------------------|:--------:|:---------:|:------------------:|:-------:|-----------------------------------------------------------------|
-| format                                  |   yes    |    no     |                    | string  | must be `avro-glue`                                             |
-| avro-glue.transport.name                |    no    |    yes    |                    | string  | computed from table name                                        |
-| avro-glue.region                        |   yes    |    yes    |                    | string  |                                                                 |
-| avro-glue.endpoint                      |    no    |    yes    |                    | string  | inferred from region                                            |
-| avro-glue.registry.name                 |    no    |    yes    | `default-registry` | string  |                                                                 |
-| avro-glue.schemaAutoRegistrationEnabled |    no    |    yes    |      `false`       | boolean |                                                                 |
-| avro-glue.schemaName                    |    no    |    yes    |                    | string  |                                                                 |
-| avro-glue.schemaNameGenerationClass     |    no    |    yes    |                    | string  | if provided, class name used to generate schema name at runtime |  
-| avro-glue.secondaryDeserializer         |    no    |    yes    |                    | string  | if provided, class name used as glue secondary deserializer     |
-| avro-glue.properties                    |    no    |    yes    |                    |   map   | will be passed on to aws glue serde as properties               |
+| Option                                  | Required | Forwarded |      Default       |  Type   | Description                                                                |
+|-----------------------------------------|:--------:|:---------:|:------------------:|:-------:|----------------------------------------------------------------------------|
+| format                                  |   yes    |    no     |                    | string  | must be `avro-glue`                                                        |
+| avro-glue.schemaName                    |   yes    |    yes    |                    | string  | the fully namespaced schema name (should match specific record class name) |
+| avro-glue.region                        |    no    |    yes    |     us-east-1      | string  | aws region your glue registry is in                                        |
+| avro-glue.endpoint                      |    no    |    yes    |                    | string  | inferred from region but useful for localstack testing                     |
+| avro-glue.registry.name                 |    no    |    yes    | `default-registry` | string  |                                                                            |
+| avro-glue.schemaAutoRegistrationEnabled |    no    |    yes    |      `false`       | boolean |                                                                            |
+| avro-glue.schemaNameGenerationClass     |    no    |    yes    |                    | string  | if provided, class name used to generate schema name at runtime            |  
+| avro-glue.secondaryDeserializer         |    no    |    yes    |                    | string  | if provided, class name used as glue secondary deserializer                |
+| avro-glue.properties                    |    no    |    yes    |                    |   map   | will be passed on to aws glue serde as properties                          |
 
 Note that all options can be prefixed with `avro-glue.schema.registry` and all camel cased options can be dot
 cased (`avro-glue.schema.auto.registration.enabled` is equivalent to `avro-glue.schemaAutoRegistrationEnabled`)

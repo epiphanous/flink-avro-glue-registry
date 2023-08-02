@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 /** Tests for the {@link AvroGlueFormatFactory}. */
 class AvroGlueFormatFactoryTest {
 
-//  final static Logger logger = LoggerFactory.getLogger(AvroGlueFormatFactoryTest.class);
+  //  final static Logger logger = LoggerFactory.getLogger(AvroGlueFormatFactoryTest.class);
 
   private static final ResolvedSchema SCHEMA =
       ResolvedSchema.of(
@@ -74,7 +74,7 @@ class AvroGlueFormatFactoryTest {
   private static final Schema AVRO_SCHEMA = new Schema.Parser().parse(SCHEMA_STRING);
 
   private static final String MY_SCHEMA_NAME = AVRO_SCHEMA.getFullName();
-  
+
   private static final Map<String, String> EXPECTED_OPTIONAL_PROPERTIES = new HashMap<>();
 
   @Test
@@ -105,7 +105,7 @@ class AvroGlueFormatFactoryTest {
     configs.put(SCHEMA_NAME.key(), MY_SCHEMA_NAME);
     configs.put(AWS_REGION.key(), AWS_REGION.defaultValue());
 
-    final AvroRowDataSerializationSchema expectedSer = getSerializer( "test-topic", configs);
+    final AvroRowDataSerializationSchema expectedSer = getSerializer("test-topic", configs);
 
     final DynamicTableSink actualSink = FactoryMocks.createTableSink(SCHEMA, getDefaultOptions());
 
@@ -120,6 +120,33 @@ class AvroGlueFormatFactoryTest {
     assertThat(actualSer).isEqualTo(expectedSer);
   }
 
+  @Test
+  void factoryIdentifier() {
+    assertThat(getFactory().factoryIdentifier()).isEqualTo(AvroGlueFormatFactory.IDENTIFIER);
+  }
+
+  @Test
+  void requiredOptions() {
+    Set<ConfigOption<?>> options = getFactory().requiredOptions();
+    assertThat(options).hasSize(1);
+    assertThat(options).contains(SCHEMA_NAME);
+  }
+
+  @Test
+  void optionalOptions() {
+    Set<ConfigOption<?>> options = getFactory().optionalOptions();
+    assertThat(options).hasSize(8);
+    assertThat(options).doesNotContain(SCHEMA_NAME);
+  }
+
+  @Test
+  void forwardOptions() {
+    Set<ConfigOption<?>> options = getFactory().forwardOptions();
+    assertThat(options).hasSize(8);
+  }
+
+  // test utils
+
   @NotNull
   private Map<String, String> getDefaultOptions() {
     Map<String, String> options = new HashMap<>();
@@ -131,34 +158,6 @@ class AvroGlueFormatFactoryTest {
     options.put("avro-glue.schema.name", MY_SCHEMA_NAME);
     return options;
   }
-
-
-  @Test
-  void factoryIdentifier() {
-    assert (Objects.equals(getFactory().factoryIdentifier(), AvroGlueFormatFactory.IDENTIFIER));
-  }
-
-  @Test
-  void requiredOptions() {
-    Set<ConfigOption<?>> options = getFactory().requiredOptions();
-    assert (options.size() == 1);
-    assert (options.contains(AWS_REGION));
-  }
-
-  @Test
-  void optionalOptions() {
-    Set<ConfigOption<?>> options = getFactory().optionalOptions();
-    assert (options.size() == 8);
-    assert (!options.contains(AWS_REGION));
-  }
-
-  @Test
-  void forwardOptions() {
-    Set<ConfigOption<?>> options = getFactory().forwardOptions();
-    assert (options.size() == 9);
-  }
-
-  // test utils
 
   AvroRowDataSerializationSchema getSerializer(String transportName, Map<String, Object> configs) {
     return new AvroRowDataSerializationSchema(

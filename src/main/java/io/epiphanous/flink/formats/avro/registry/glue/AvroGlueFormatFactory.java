@@ -128,7 +128,7 @@ public class AvroGlueFormatFactory
   @Override
   public Set<ConfigOption<?>> optionalOptions() {
     Set<ConfigOption<?>> options = new HashSet<>();
-    options.add(KAFKA_TOPIC);
+    options.add(KAFKA_TOPIC); // required for our tests, but not otherwise
     options.add(PROPERTIES);
     options.add(REGISTRY_NAME);
     options.add(AWS_REGION);
