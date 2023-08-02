@@ -1,0 +1,161 @@
+package io.epiphanous.flink.formats.avro.registry.glue;
+
+import static io.epiphanous.flink.formats.avro.registry.glue.AvroGlueFormatOptions.*;
+
+import java.util.*;
+import javax.validation.constraints.NotNull;
+import org.apache.flink.annotation.VisibleForTesting;
+import org.apache.flink.api.common.serialization.DeserializationSchema;
+import org.apache.flink.api.common.serialization.SerializationSchema;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.configuration.ConfigOption;
+import org.apache.flink.configuration.ReadableConfig;
+import org.apache.flink.formats.avro.*;
+import org.apache.flink.formats.avro.typeutils.AvroSchemaConverter;
+import org.apache.flink.table.connector.ChangelogMode;
+import org.apache.flink.table.connector.Projection;
+import org.apache.flink.table.connector.format.DecodingFormat;
+import org.apache.flink.table.connector.format.EncodingFormat;
+import org.apache.flink.table.connector.format.ProjectableDecodingFormat;
+import org.apache.flink.table.connector.sink.DynamicTableSink;
+import org.apache.flink.table.connector.source.DynamicTableSource;
+import org.apache.flink.table.data.RowData;
+import org.apache.flink.table.factories.DeserializationFormatFactory;
+import org.apache.flink.table.factories.DynamicTableFactory;
+import org.apache.flink.table.factories.FactoryUtil;
+import org.apache.flink.table.factories.SerializationFormatFactory;
+import org.apache.flink.table.types.DataType;
+import org.apache.flink.table.types.logical.RowType;
+
+/**
+ * Table format factory for providing configured instances of Glue Schema Avro Registry to RowData
+ * {@link SerializationSchema} and {@link DeserializationSchema}.
+ */
+public class AvroGlueFormatFactory
+    implements DeserializationFormatFactory, SerializationFormatFactory {
+
+  public static final String IDENTIFIER = "avro-glue";
+
+  @Override
+  public DecodingFormat<DeserializationSchema<RowData>> createDecodingFormat(
+      DynamicTableFactory.Context context, ReadableConfig formatOptions) {
+    FactoryUtil.validateFactoryOptions(this, formatOptions);
+
+    Map<String, Object> configs = buildConfigs(formatOptions);
+
+    return new ProjectableDecodingFormat<DeserializationSchema<RowData>>() {
+      @Override
+      public DeserializationSchema<RowData> createRuntimeDecoder(
+          DynamicTableSource.Context context, DataType producedDataType, int[][] projections) {
+        producedDataType = Projection.of(projections).project(producedDataType);
+        final RowType rowType = (RowType) producedDataType.getLogicalType();
+        final TypeInformation<RowData> rowDataTypeInfo =
+            context.createTypeInformation(producedDataType);
+        return new AvroRowDataDeserializationSchema(
+            GlueAvroDeserializationSchema.forGeneric(
+                AvroSchemaConverter.convertToSchema(rowType), configs),
+            AvroToRowDataConverters.createRowConverter(rowType),
+            rowDataTypeInfo);
+      }
+
+      @Override
+      public ChangelogMode getChangelogMode() {
+        return ChangelogMode.insertOnly();
+      }
+    };
+  }
+
+  @Override
+  public EncodingFormat<SerializationSchema<RowData>> createEncodingFormat(
+      DynamicTableFactory.Context context, ReadableConfig formatOptions) {
+    FactoryUtil.validateFactoryOptions(this, formatOptions);
+
+    String transportName =
+        formatOptions
+            .getOptional(TRANSPORT_NAME)
+            .orElse(context.getObjectIdentifier().asSerializableString());
+    Map<String, Object> configs = buildConfigs(formatOptions);
+
+    return new EncodingFormat<SerializationSchema<RowData>>() {
+      @Override
+      public SerializationSchema<RowData> createRuntimeEncoder(
+          DynamicTableSink.Context context, DataType consumedDataType) {
+        final RowType rowType = (RowType) consumedDataType.getLogicalType();
+        return new AvroRowDataSerializationSchema(
+            rowType,
+            GlueAvroSerializationSchema.forGeneric(
+                AvroSchemaConverter.convertToSchema(rowType), transportName, configs),
+            RowDataToAvroConverters.createConverter(rowType));
+      }
+
+      @Override
+      public ChangelogMode getChangelogMode() {
+        return ChangelogMode.insertOnly();
+      }
+    };
+  }
+
+  @Override
+  public String factoryIdentifier() {
+    return IDENTIFIER;
+  }
+
+  @Override
+  public Set<ConfigOption<?>> requiredOptions() {
+    Set<ConfigOption<?>> options = new HashSet<>();
+    options.add(AWS_REGION);
+    return options;
+  }
+
+  @Override
+  public Set<ConfigOption<?>> optionalOptions() {
+    Set<ConfigOption<?>> options = new HashSet<>();
+    options.add(PROPERTIES);
+    options.add(TRANSPORT_NAME);
+    options.add(SCHEMA_NAME);
+    options.add(REGISTRY_NAME);
+    options.add(AWS_ENDPOINT);
+    options.add(SCHEMA_AUTO_REGISTRATION_SETTING);
+    options.add(SCHEMA_NAMING_GENERATION_CLASS);
+    options.add(SECONDARY_DESERIALIZER);
+    return options;
+  }
+
+  @Override
+  public Set<ConfigOption<?>> forwardOptions() {
+    Set<ConfigOption<?>> options = new HashSet<>();
+    options.add(REGISTRY_NAME);
+    options.add(PROPERTIES);
+    options.add(TRANSPORT_NAME);
+    options.add(SCHEMA_NAME);
+    options.add(AWS_REGION);
+    options.add(AWS_ENDPOINT);
+    options.add(SCHEMA_AUTO_REGISTRATION_SETTING);
+    options.add(SCHEMA_NAMING_GENERATION_CLASS);
+    options.add(SECONDARY_DESERIALIZER);
+    return options;
+  }
+
+  @NotNull
+  @VisibleForTesting
+  private Map<String, Object> buildConfigs(ReadableConfig formatOptions) {
+    HashMap<String, Object> configs = new HashMap<>();
+    configs.put(AWS_REGION.key(), formatOptions.get(AWS_REGION));
+    formatOptions.getOptional(PROPERTIES).ifPresent(configs::putAll);
+    formatOptions.getOptional(AWS_ENDPOINT).ifPresent(v -> configs.put(AWS_ENDPOINT.key(), v));
+    formatOptions.getOptional(REGISTRY_NAME).ifPresent(v -> configs.put(REGISTRY_NAME.key(), v));
+    formatOptions.getOptional(TRANSPORT_NAME).ifPresent(v -> configs.put(TRANSPORT_NAME.key(), v));
+    formatOptions.getOptional(SCHEMA_NAME).ifPresent(v -> configs.put(SCHEMA_NAME.key(), v));
+    formatOptions
+        .getOptional(SCHEMA_AUTO_REGISTRATION_SETTING)
+        .ifPresent(v -> configs.put(SCHEMA_AUTO_REGISTRATION_SETTING.key(), v));
+    formatOptions
+        .getOptional(SCHEMA_NAMING_GENERATION_CLASS)
+        .ifPresent(v -> configs.put(SCHEMA_NAMING_GENERATION_CLASS.key(), v));
+    formatOptions
+        .getOptional(SECONDARY_DESERIALIZER)
+        .ifPresent(v -> configs.put(SECONDARY_DESERIALIZER.key(), v));
+
+    return configs;
+  }
+}

@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="afc92327-c142-4d30-ac2c-2aac056e4a41" name="Changes" comment="initial commit">
+      <change beforePath="$PROJECT_DIR$/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+        <option value="JUnit5 Test Class" />
+      </list>
+    </option>
+  </component>
+  <component name="FormatOnSaveOptions">
+    <option name="myRunOnSave" value="true" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="OptimizeOnSaveOptions">
+    <option name="myRunOnSave" value="true" />
+  </component>
+  <component name="ProjectCodeStyleSettingsMigration">
+    <option name="version" value="2" />
+  </component>
+  <component name="ProjectId" id="2TLDu2BKKQ3fKb90m6nKhBx8meQ" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary&quot;: &quot;JUnit5&quot;,
+    &quot;com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5&quot;: &quot;&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/rlyons/git/epiphanous/flink-avro-glue-registry&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CreateTestDialog.Recents.Supers">
+      <recent name="" />
+    </key>
+    <key name="CreateTestDialog.RecentsKey">
+      <recent name="io.epiphanous.flink.formats.avro.registry.glue" />
+    </key>
+  </component>
+  <component name="RunManager" selected="JUnit.AvroGlueFormatOptionsTest.dotCase">
+    <configuration name="AvroGlueFormatFactoryTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="flink-avro-glue-registry" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="io.epiphanous.flink.formats.avro.registry.glue.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="io.epiphanous.flink.formats.avro.registry.glue" />
+      <option name="MAIN_CLASS_NAME" value="io.epiphanous.flink.formats.avro.registry.glue.AvroGlueFormatFactoryTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="AvroGlueFormatFactoryTest.testDeserializationSchema" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="flink-avro-glue-registry" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="io.epiphanous.flink.formats.avro.registry.glue.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="io.epiphanous.flink.formats.avro.registry.glue" />
+      <option name="MAIN_CLASS_NAME" value="io.epiphanous.flink.formats.avro.registry.glue.AvroGlueFormatFactoryTest" />
+      <option name="METHOD_NAME" value="testDeserializationSchema" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="AvroGlueFormatFactoryTest.testSerializationSchema" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="flink-avro-glue-registry" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="io.epiphanous.flink.formats.avro.registry.glue.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="io.epiphanous.flink.formats.avro.registry.glue" />
+      <option name="MAIN_CLASS_NAME" value="io.epiphanous.flink.formats.avro.registry.glue.AvroGlueFormatFactoryTest" />
+      <option name="METHOD_NAME" value="testSerializationSchema" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="AvroGlueFormatOptionsTest.dotCase" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="flink-avro-glue-registry" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="io.epiphanous.flink.formats.avro.registry.glue.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="io.epiphanous.flink.formats.avro.registry.glue" />
+      <option name="MAIN_CLASS_NAME" value="io.epiphanous.flink.formats.avro.registry.glue.AvroGlueFormatOptionsTest" />
+      <option name="METHOD_NAME" value="dotCase" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="GlueAvroCoderProviderTest.testEquals" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="flink-avro-glue-registry" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="io.epiphanous.flink.formats.avro.registry.glue.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="io.epiphanous.flink.formats.avro.registry.glue" />
+      <option name="MAIN_CLASS_NAME" value="io.epiphanous.flink.formats.avro.registry.glue.GlueAvroCoderProviderTest" />
+      <option name="METHOD_NAME" value="testEquals" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JUnit.AvroGlueFormatOptionsTest.dotCase" />
+        <item itemvalue="JUnit.GlueAvroCoderProviderTest.testEquals" />
+        <item itemvalue="JUnit.AvroGlueFormatFactoryTest" />
+        <item itemvalue="JUnit.AvroGlueFormatFactoryTest.testDeserializationSchema" />
+        <item itemvalue="JUnit.AvroGlueFormatFactoryTest.testSerializationSchema" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="afc92327-c142-4d30-ac2c-2aac056e4a41" name="Changes" comment="" />
+      <created>1690813687113</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1690813687113</updated>
+      <workItem from="1690813688581" duration="4456000" />
+      <workItem from="1690818164061" duration="90000" />
+      <workItem from="1690818274244" duration="4296000" />
+      <workItem from="1690853648144" duration="1951000" />
+      <workItem from="1690855783674" duration="13260000" />
+      <workItem from="1690900349989" duration="6134000" />
+      <workItem from="1690913609860" duration="12244000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="initial commit" />
+    <option name="LAST_COMMIT_MESSAGE" value="initial commit" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/src/test/java/io/epiphanous/flink/formats/avro/registry/glue/GlueAvroCoderProviderTest.java</url>
+          <line>25</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/io/epiphanous/flink/formats/avro/registry/glue/GlueAvroCoderProvider.java</url>
+          <line>37</line>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>jar://$MAVEN_REPOSITORY$/org/apache/flink/flink-avro/1.17.1/flink-avro-1.17.1.jar!/org/apache/flink/formats/avro/AvroRowDataSerializationSchema.class</url>
+          <line>39</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>jar://$MAVEN_REPOSITORY$/org/apache/flink/flink-avro/1.17.1/flink-avro-1.17.1.jar!/org/apache/flink/formats/avro/RowDataToAvroConverters.class</url>
+          <line>191</line>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/test/java/io/epiphanous/flink/formats/avro/registry/glue/AvroGlueFormatFactoryTest.java</url>
+          <line>92</line>
+          <option name="timeStamp" value="13" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/test/java/io/epiphanous/flink/formats/avro/registry/glue/AvroGlueFormatFactoryTest.java</url>
+          <line>100</line>
+          <option name="timeStamp" value="14" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/test/java/io/epiphanous/flink/formats/avro/registry/glue/AvroGlueFormatFactoryTest.java</url>
+          <line>112</line>
+          <option name="timeStamp" value="15" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+</project>
