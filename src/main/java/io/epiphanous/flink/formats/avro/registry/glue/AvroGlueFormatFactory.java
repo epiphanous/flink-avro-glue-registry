@@ -53,7 +53,9 @@ public class AvroGlueFormatFactory
 
     Map<String, Object> configs = buildConfigs(formatOptions);
 
-    LOG.debug("createDecodingFormat() with schemaName {} and configs {}", schemaName, configs);
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("createDecodingFormat() with schemaName {} and configs {}", schemaName, configs);
+    }
 
     return new ProjectableDecodingFormat<DeserializationSchema<RowData>>() {
       @Override
@@ -100,11 +102,13 @@ public class AvroGlueFormatFactory
 
     Map<String, Object> configs = buildConfigs(formatOptions);
 
-    LOG.debug(
-        "createEncodingFormat() with topic {}, schemaName {} and configs {}",
-        topic,
-        schemaName,
-        configs);
+    if (LOG.isDebugEnabled()) {
+      LOG.debug(
+          "createEncodingFormat() with topic {}, schemaName {} and configs {}",
+          topic,
+          schemaName,
+          configs);
+    }
 
     return new EncodingFormat<SerializationSchema<RowData>>() {
       @Override

@@ -23,7 +23,8 @@ public class AvroGlueFormatOptions {
           .stringType()
           .noDefaultValue()
           .withDescription(
-              "This is not used as a config for the format, but to pull in the table kafka connector topic configuration.");
+              "This is not used as a config for the format, but to pull in the "
+                  + "table kafka connector topic configuration.");
 
   public static final ConfigOption<String> SCHEMA_NAME =
       ConfigOptions.key(AWSSchemaRegistryConstants.SCHEMA_NAME)
@@ -33,7 +34,9 @@ public class AvroGlueFormatOptions {
               dotCase(AWSSchemaRegistryConstants.SCHEMA_NAME),
               "schema.registry." + AWSSchemaRegistryConstants.SCHEMA_NAME,
               "schema.registry." + dotCase(AWSSchemaRegistryConstants.SCHEMA_NAME))
-          .withDescription("The schema name to register the schema under.");
+          .withDescription(
+              "The schema name to register the schema under. This is required "
+                  + " and should be the same as the avro schema's full name.");
 
   public static final ConfigOption<String> AWS_REGION =
       ConfigOptions.key(AWSSchemaRegistryConstants.AWS_REGION)
@@ -41,7 +44,8 @@ public class AvroGlueFormatOptions {
           .defaultValue(Region.US_EAST_1.toString())
           .withFallbackKeys("aws.region")
           .withDescription(
-              "The AWS Region your Glue schema registry operates in (defaults to us-east-1).");
+              "The AWS Region your Glue schema registry operates in (defaults "
+                  + "to 'us-east-1').");
 
   public static final ConfigOption<String> AWS_ENDPOINT =
       ConfigOptions.key(AWSSchemaRegistryConstants.AWS_ENDPOINT)
@@ -59,7 +63,7 @@ public class AvroGlueFormatOptions {
           .defaultValue(AWSSchemaRegistryConstants.DEFAULT_REGISTRY_NAME)
           .withFallbackKeys("schema.registry." + AWSSchemaRegistryConstants.REGISTRY_NAME)
           .withDescription(
-              "The name of the Flue registry to operate on. "
+              "The name of the Glue registry to operate on. "
                   + "Defaults"
                   + " to "
                   + AWSSchemaRegistryConstants.DEFAULT_REGISTRY_NAME
@@ -89,7 +93,7 @@ public class AvroGlueFormatOptions {
                   + dotCase(AWSSchemaRegistryConstants.SCHEMA_NAMING_GENERATION_CLASS))
           .withDescription(
               "The name of a class implementing "
-                  + "`AWSSchemaNamingStrategy` that will be used to dynamically "
+                  + "'AWSSchemaNamingStrategy' that will be used to dynamically "
                   + "determine the name of the schema for each data object being "
                   + "serialized.");
   public static final ConfigOption<String> SECONDARY_DESERIALIZER =
@@ -112,7 +116,7 @@ public class AvroGlueFormatOptions {
           .withFallbackKeys("schema.registry.properties")
           .withDescription(
               "Properties map that is forwarded to the underlying "
-                  + "Schema Registry. This is useful for options that are not "
+                  + "schema registry. This is useful for options that are not "
                   + "officially exposed via Flink config options. However, note that "
                   + "Flink options have higher precedence.");
 

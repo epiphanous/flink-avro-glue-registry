@@ -1,13 +1,12 @@
 # Avro-Glue Format
 
-> **THIS IS NOT AN OFFICIAL AWS GLUE LIBRARY**
+> NOTE: This is **NOT** an official AWS Glue Library.
 
 This library supports using AWS Glue Schema Registry encoded messages in Flink SQL code.
 
-The Avro-Glue format allows you to serialize/deserialize records via the AWS
+The Avro-Glue format allows you to serialize and deserialize records via AWS
 Glue's `com.amazonaws.services.schemaregistry.flink.avro.GlueSchemaRegistryAvroSchemaCoder` library. This can
-only be used
-in conjunction with the Apache Kafka SQL connector and Upsert Kafka SQL connector.
+only be used in conjunction with the Apache Kafka SQL connector and Upsert Kafka SQL connector.
 
 ## Dependencies
 
@@ -18,7 +17,7 @@ tool (such as Maven or SBT) and SQL Client with SQL JAR bundles.
   <dependency>
     <groupId>io.epiphanous</groupId>
     <artifactId>flink-avro-glue-registry</artifactId>
-    <version>1.0.0</version>
+    <version>${avro-glue.version}</version>
   </dependency>
   
   <dependency>
@@ -43,6 +42,7 @@ CREATE TABLE user_created (
                              = 'localhost:9092',
     
   'format'                   = 'avro-glue',
+  'avro-glue.schemaName'     = 'org.example.avro.MyEventClass'
   'avro-glue.region'         = 'us-east-1',
   'avro-glue.registry'       = 'my-glue-registry',
   'avro-glue.transport.name' = 'user_events'
@@ -57,11 +57,11 @@ CREATE TABLE user_created (
 | avro-glue.schemaName                    |   yes    |    yes    |                    | string  | the fully namespaced schema name (should match specific record class name) |
 | avro-glue.region                        |    no    |    yes    |     us-east-1      | string  | aws region your glue registry is in                                        |
 | avro-glue.endpoint                      |    no    |    yes    |                    | string  | inferred from region but useful for localstack testing                     |
-| avro-glue.registry.name                 |    no    |    yes    | `default-registry` | string  |                                                                            |
-| avro-glue.schemaAutoRegistrationEnabled |    no    |    yes    |      `false`       | boolean |                                                                            |
+| avro-glue.registry.name                 |    no    |    yes    | `default-registry` | string  | name of the glue registry                                                  |
+| avro-glue.schemaAutoRegistrationEnabled |    no    |    yes    |      `false`       | boolean | if true, auto registers missing schemas on serialization                   |
 | avro-glue.schemaNameGenerationClass     |    no    |    yes    |                    | string  | if provided, class name used to generate schema name at runtime            |  
 | avro-glue.secondaryDeserializer         |    no    |    yes    |                    | string  | if provided, class name used as glue secondary deserializer                |
 | avro-glue.properties                    |    no    |    yes    |                    |   map   | will be passed on to aws glue serde as properties                          |
 
 Note that all options can be prefixed with `avro-glue.schema.registry` and all camel cased options can be dot
-cased (`avro-glue.schema.auto.registration.enabled` is equivalent to `avro-glue.schemaAutoRegistrationEnabled`)
+cased (`avro-glue.schema.auto.registration.enabled` is equivalent to `avro-glue.schemaAutoRegistrationEnabled`).

@@ -6,8 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="afc92327-c142-4d30-ac2c-2aac056e4a41" name="Changes" comment="initial commit">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/io/epiphanous/flink/formats/avro/registry/glue/AvroGlueFormatFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/epiphanous/flink/formats/avro/registry/glue/AvroGlueFormatFactory.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/io/epiphanous/flink/formats/avro/registry/glue/AvroGlueFormatFactoryTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/io/epiphanous/flink/formats/avro/registry/glue/AvroGlueFormatFactoryTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/io/epiphanous/flink/formats/avro/registry/glue/AvroGlueFormatOptions.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/epiphanous/flink/formats/avro/registry/glue/AvroGlueFormatOptions.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -223,7 +225,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/io/epiphanous/flink/formats/avro/registry/glue/AvroGlueFormatFactory.java</url>
-          <line>91</line>
+          <line>93</line>
           <option name="timeStamp" value="16" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
