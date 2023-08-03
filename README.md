@@ -27,6 +27,9 @@ tool (such as Maven or SBT) and SQL Client with SQL JAR bundles.
   </dependency>
 ```
 
+The AWS `schema-registry-flink-serde` dependency is required because the Avro-Glue format relies on AWS' official
+`GlueSchemaRegistryAvroSchemaCoder` to interact with AWS Glue.
+
 ## Create tables with Avro-Glue Format
 
 ```
