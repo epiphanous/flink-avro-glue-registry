@@ -42,7 +42,7 @@ CREATE TABLE user_created (
                              = 'localhost:9092',
     
   'format'                   = 'avro-glue',
-  'avro-glue.schemaName'     = 'org.example.avro.MyEventClass'
+  'avro-glue.schemaName'     = 'org.example.avro.UserEvent'
   'avro-glue.region'         = 'us-east-1',
   'avro-glue.registry'       = 'my-glue-registry',
   'avro-glue.transport.name' = 'user_events'
