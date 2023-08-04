@@ -5,7 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="afc92327-c142-4d30-ac2c-2aac056e4a41" name="Changes" comment="initial commit">
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/io/epiphanous/flink/formats/avro/registry/glue/AvroGlueFormatFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/epiphanous/flink/formats/avro/registry/glue/AvroGlueFormatFactory.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,7 +72,7 @@
       <recent name="io.epiphanous.flink.formats.avro.registry.glue" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.AvroGlueFormatFactoryTest.testRequiredOptions">
+  <component name="RunManager" selected="JUnit.glue in flink-avro-glue-registry">
     <configuration name="AvroGlueFormatFactoryTest.testForwardOptions" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="flink-avro-glue-registry" />
       <extension name="coverage">
@@ -82,22 +84,6 @@
       <option name="PACKAGE_NAME" value="io.epiphanous.flink.formats.avro.registry.glue" />
       <option name="MAIN_CLASS_NAME" value="io.epiphanous.flink.formats.avro.registry.glue.AvroGlueFormatFactoryTest" />
       <option name="METHOD_NAME" value="testForwardOptions" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="AvroGlueFormatFactoryTest.testMissingSchemaName" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="flink-avro-glue-registry" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="io.epiphanous.flink.formats.avro.registry.glue.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="io.epiphanous.flink.formats.avro.registry.glue" />
-      <option name="MAIN_CLASS_NAME" value="io.epiphanous.flink.formats.avro.registry.glue.AvroGlueFormatFactoryTest" />
-      <option name="METHOD_NAME" value="testMissingSchemaName" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -151,13 +137,21 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="glue in flink-avro-glue-registry" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="flink-avro-glue-registry" />
+      <option name="TEST_OBJECT" value="directory" />
+      <dir value="$PROJECT_DIR$/src/test/java/io/epiphanous/flink/formats/avro/registry/glue" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.glue in flink-avro-glue-registry" />
         <item itemvalue="JUnit.AvroGlueFormatFactoryTest.testRequiredOptions" />
         <item itemvalue="JUnit.AvroGlueFormatFactoryTest.testForwardOptions" />
         <item itemvalue="JUnit.AvroGlueFormatFactoryTest.testOptionalOptions" />
         <item itemvalue="JUnit.AvroGlueFormatFactoryTest.testMissingTopicName" />
-        <item itemvalue="JUnit.AvroGlueFormatFactoryTest.testMissingSchemaName" />
       </list>
     </recent_temporary>
   </component>
@@ -218,11 +212,6 @@
           <url>file://$PROJECT_DIR$/src/test/java/io/epiphanous/flink/formats/avro/registry/glue/AvroGlueFormatFactoryTest.java</url>
           <line>121</line>
           <option name="timeStamp" value="15" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/io/epiphanous/flink/formats/avro/registry/glue/AvroGlueFormatFactory.java</url>
-          <line>93</line>
-          <option name="timeStamp" value="16" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/src/test/java/io/epiphanous/flink/formats/avro/registry/glue/AvroGlueFormatFactoryTest.java</url>

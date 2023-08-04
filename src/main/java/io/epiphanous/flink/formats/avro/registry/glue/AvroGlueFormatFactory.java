@@ -41,8 +41,6 @@ public class AvroGlueFormatFactory
 
   public static final String IDENTIFIER = "avro-glue";
 
-  private static final String MISSING_TOPIC = "__missing_topic__";
-
   @Override
   public DecodingFormat<DeserializationSchema<RowData>> createDecodingFormat(
       DynamicTableFactory.Context context, ReadableConfig formatOptions) {
@@ -89,15 +87,14 @@ public class AvroGlueFormatFactory
         context
             .getConfiguration()
             .getOptional(KAFKA_TOPIC)
-            .orElse(formatOptions.getOptional(KAFKA_TOPIC).orElse(MISSING_TOPIC));
-
-    if (topic.equals(MISSING_TOPIC)) {
-      throw new ValidationException(
-          String.format(
-              "Kafka topic not found among %s options",
-              context.getObjectIdentifier().asSummaryString()));
-    }
-
+            .or(() -> formatOptions.getOptional(KAFKA_TOPIC))
+            .orElseThrow(
+                () ->
+                    new ValidationException(
+                        String.format(
+                            "Kafka topic not found among table %s options",
+                            context.getObjectIdentifier().asSummaryString())));
+    
     String schemaName = formatOptions.get(SCHEMA_NAME);
 
     Map<String, Object> configs = buildConfigs(formatOptions);
