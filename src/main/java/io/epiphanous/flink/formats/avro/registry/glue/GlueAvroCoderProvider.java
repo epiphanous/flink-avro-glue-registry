@@ -7,13 +7,12 @@ import java.util.Objects;
 import org.apache.flink.formats.avro.SchemaCoder;
 
 /**
- * A testable alternative to {@link GlueSchemaRegistryAvroSchemaCoderProvider} which provides a
- * proper equals implementation.
+ * A testable alternative to {@link GlueSchemaRegistryAvroSchemaCoderProvider}. This class provides
+ * a proper equals() implementation.
  */
 public class GlueAvroCoderProvider implements SchemaCoder.SchemaCoderProvider {
 
   private static final long serialVersionUID = 7177175572100118398L;
-
 
   protected final String transportName;
   protected final Map<String, Object> configs;
