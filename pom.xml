@@ -183,22 +183,15 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
+                <groupId>org.simplify4u.plugins</groupId>
+                <artifactId>sign-maven-plugin</artifactId>
+                <version>1.0.1</version>
                 <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                        <configuration>
-                            <gpgArguments>
-                                <arg>--pinentry-mode</arg>
-                                <arg>loopback</arg>
-                            </gpgArguments>
-                        </configuration>
-                    </execution>
+                  <execution>
+                    <goals>
+                      <goal>sign</goal>
+                    </goals>
+                  </execution>
                 </executions>
             </plugin>
             <plugin>
