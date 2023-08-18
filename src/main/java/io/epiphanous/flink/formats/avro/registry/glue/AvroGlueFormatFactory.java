@@ -168,7 +168,7 @@ public class AvroGlueFormatFactory
 
   @NotNull
   @VisibleForTesting
-  private Map<String, Object> buildConfigs(ReadableConfig formatOptions) {
+  public static Map<String, Object> buildConfigs(ReadableConfig formatOptions) {
     HashMap<String, Object> configs = new HashMap<>();
     configs.put(AWS_REGION.key(), formatOptions.get(AWS_REGION));
     configs.put(SCHEMA_NAME.key(), formatOptions.get(SCHEMA_NAME));
