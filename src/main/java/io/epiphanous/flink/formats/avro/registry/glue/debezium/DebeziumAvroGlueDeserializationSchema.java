@@ -1,4 +1,4 @@
-package org.apache.flink.formats.avro.registry.confluent.debezium;
+package io.epiphanous.flink.formats.avro.registry.glue.debezium;
 
 import org.apache.flink.annotation.Internal;
 import org.apache.flink.annotation.VisibleForTesting;
@@ -6,7 +6,6 @@ import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.formats.avro.AvroRowDataDeserializationSchema;
 import org.apache.flink.formats.avro.AvroToRowDataConverters;
-import org.apache.flink.formats.avro.registry.confluent.ConfluentRegistryAvroDeserializationSchema;
 import org.apache.flink.formats.avro.typeutils.AvroSchemaConverter;
 import org.apache.flink.table.api.DataTypes;
 import org.apache.flink.table.data.GenericRowData;
@@ -16,24 +15,26 @@ import org.apache.flink.table.types.logical.RowType;
 import org.apache.flink.types.RowKind;
 import org.apache.flink.util.Collector;
 
-import org.apache.avro.Schema;
-import org.apache.avro.Schema.Parser;
+import io.epiphanous.flink.formats.avro.registry.glue.GlueAvroDeserializationSchema;
 
-import javax.annotation.Nullable;
+import org.apache.avro.Schema;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 
 import static java.lang.String.format;
-import static org.apache.flink.formats.avro.registry.confluent.debezium.DebeziumAvroFormatFactory.validateSchemaString;
 import static org.apache.flink.table.types.utils.TypeConversions.fromLogicalToDataType;
 
 /**
- * Deserialization schema from Debezium Avro to Flink Table/SQL internal data structure {@link
- * RowData}. The deserialization schema knows Debezium's schema definition and can extract the
- * database data and convert into {@link RowData} with {@link RowKind}. Deserializes a <code>byte[]
- * </code> message as a JSON object and reads the specified fields. Failures during deserialization
+ * Deserialization schema from Debezium Avro to Flink Table/SQL internal data
+ * structure {@link
+ * RowData}. The deserialization schema knows Debezium's schema definition and
+ * can extract the
+ * database data and convert into {@link RowData} with {@link RowKind}.
+ * Deserializes a <code>byte[]
+ * </code> message as a JSON object and reads the specified fields. Failures
+ * during deserialization
  * are forwarded as wrapped IOExceptions.
  *
  * @see <a href="https://debezium.io/">Debezium</a>
@@ -51,10 +52,9 @@ public final class DebeziumAvroGlueDeserializationSchema implements Deserializat
     /** delete operation. */
     private static final String OP_DELETE = "d";
 
-    private static final String REPLICA_IDENTITY_EXCEPTION =
-            "The \"before\" field of %s message is null, "
-                    + "if you are using Debezium Postgres Connector, "
-                    + "please check the Postgres table has been set REPLICA IDENTITY to FULL level.";
+    private static final String REPLICA_IDENTITY_EXCEPTION = "The \"before\" field of %s message is null, "
+            + "if you are using Debezium Postgres Connector, "
+            + "please check the Postgres table has been set REPLICA IDENTITY to FULL level.";
 
     /** The deserializer to deserialize Debezium Avro data. */
     private final AvroRowDataDeserializationSchema avroDeserializer;
@@ -65,28 +65,20 @@ public final class DebeziumAvroGlueDeserializationSchema implements Deserializat
     public DebeziumAvroGlueDeserializationSchema(
             RowType rowType,
             TypeInformation<RowData> producedTypeInfo,
-            String schemaRegistryUrl,
-            @Nullable String schemaString,
-            @Nullable Map<String, ?> registryConfigs) {
+            String schemaName,
+            Map<String, Object> config) {
         this.producedTypeInfo = producedTypeInfo;
+
         RowType debeziumAvroRowType = createDebeziumAvroRowType(fromLogicalToDataType(rowType));
-
-        validateSchemaString(schemaString, debeziumAvroRowType);
-        Schema schema =
-                schemaString == null
-                        ? AvroSchemaConverter.convertToSchema(debeziumAvroRowType)
-                        : new Parser().parse(schemaString);
-
-        this.avroDeserializer =
-                new AvroRowDataDeserializationSchema(
-                        ConfluentRegistryAvroDeserializationSchema.forGeneric(
-                                schema, schemaRegistryUrl, registryConfigs),
-                        AvroToRowDataConverters.createRowConverter(debeziumAvroRowType),
-                        producedTypeInfo);
+        Schema debeziumAvroSchema = AvroSchemaConverter.convertToSchema(debeziumAvroRowType, schemaName);
+        this.avroDeserializer = new AvroRowDataDeserializationSchema(
+                GlueAvroDeserializationSchema.forGeneric(debeziumAvroSchema, config),
+                AvroToRowDataConverters.createRowConverter(debeziumAvroRowType),
+                producedTypeInfo);
     }
 
     @VisibleForTesting
-    DebeziumAvroDeserializationSchema(
+    DebeziumAvroGlueDeserializationSchema(
             TypeInformation<RowData> producedTypeInfo,
             AvroRowDataDeserializationSchema avroDeserializer) {
         this.producedTypeInfo = producedTypeInfo;
@@ -166,7 +158,7 @@ public final class DebeziumAvroGlueDeserializationSchema implements Deserializat
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        DebeziumAvroDeserializationSchema that = (DebeziumAvroDeserializationSchema) o;
+        DebeziumAvroGlueDeserializationSchema that = (DebeziumAvroGlueDeserializationSchema) o;
         return Objects.equals(avroDeserializer, that.avroDeserializer)
                 && Objects.equals(producedTypeInfo, that.producedTypeInfo);
     }
@@ -179,11 +171,10 @@ public final class DebeziumAvroGlueDeserializationSchema implements Deserializat
     public static RowType createDebeziumAvroRowType(DataType databaseSchema) {
         // Debezium Avro contains other information, e.g. "source", "ts_ms"
         // but we don't need them
-        return (RowType)
-                DataTypes.ROW(
-                                DataTypes.FIELD("before", databaseSchema.nullable()),
-                                DataTypes.FIELD("after", databaseSchema.nullable()),
-                                DataTypes.FIELD("op", DataTypes.STRING()))
-                        .getLogicalType();
+        return (RowType) DataTypes.ROW(
+                DataTypes.FIELD("before", databaseSchema.nullable()),
+                DataTypes.FIELD("after", databaseSchema.nullable()),
+                DataTypes.FIELD("op", DataTypes.STRING()))
+                .getLogicalType();
     }
 }

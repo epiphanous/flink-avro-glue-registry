@@ -31,160 +31,158 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Table format factory for providing configured instances of Glue Schema Avro Registry to RowData
+ * Table format factory for providing configured instances of Glue Schema Avro
+ * Registry to RowData
  * {@link SerializationSchema} and {@link DeserializationSchema}.
  */
 public class AvroGlueFormatFactory
-    implements DeserializationFormatFactory, SerializationFormatFactory {
+        implements DeserializationFormatFactory, SerializationFormatFactory {
 
-  private static final Logger LOG = LoggerFactory.getLogger(AvroGlueFormatFactory.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AvroGlueFormatFactory.class);
 
-  public static final String IDENTIFIER = "avro-glue";
+    public static final String IDENTIFIER = "avro-glue";
 
-  @Override
-  public DecodingFormat<DeserializationSchema<RowData>> createDecodingFormat(
-      DynamicTableFactory.Context context, ReadableConfig formatOptions) {
+    @Override
+    public DecodingFormat<DeserializationSchema<RowData>> createDecodingFormat(
+            DynamicTableFactory.Context context, ReadableConfig formatOptions) {
 
-    FactoryUtil.validateFactoryOptions(this, formatOptions);
+        FactoryUtil.validateFactoryOptions(this, formatOptions);
 
-    String schemaName = formatOptions.get(SCHEMA_NAME);
+        String schemaName = formatOptions.get(SCHEMA_NAME);
 
-    Map<String, Object> configs = buildConfigs(formatOptions);
+        Map<String, Object> configs = buildConfigs(formatOptions);
 
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("createDecodingFormat() with schemaName {} and configs {}", schemaName, configs);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("createDecodingFormat() with schemaName {} and configs {}", schemaName, configs);
+        }
+
+        return new ProjectableDecodingFormat<DeserializationSchema<RowData>>() {
+            @Override
+            public DeserializationSchema<RowData> createRuntimeDecoder(
+                    DynamicTableSource.Context context, DataType producedDataType, int[][] projections) {
+                producedDataType = Projection.of(projections).project(producedDataType);
+                final RowType rowType = (RowType) producedDataType.getLogicalType();
+                final TypeInformation<RowData> rowDataTypeInfo = context.createTypeInformation(producedDataType);
+                return new AvroRowDataDeserializationSchema(
+                        GlueAvroDeserializationSchema.forGeneric(
+                                AvroSchemaConverter.convertToSchema(rowType, schemaName), configs),
+                        AvroToRowDataConverters.createRowConverter(rowType),
+                        rowDataTypeInfo);
+            }
+
+            @Override
+            public ChangelogMode getChangelogMode() {
+                return ChangelogMode.insertOnly();
+            }
+        };
     }
 
-    return new ProjectableDecodingFormat<DeserializationSchema<RowData>>() {
-      @Override
-      public DeserializationSchema<RowData> createRuntimeDecoder(
-          DynamicTableSource.Context context, DataType producedDataType, int[][] projections) {
-        producedDataType = Projection.of(projections).project(producedDataType);
-        final RowType rowType = (RowType) producedDataType.getLogicalType();
-        final TypeInformation<RowData> rowDataTypeInfo =
-            context.createTypeInformation(producedDataType);
-        return new AvroRowDataDeserializationSchema(
-            GlueAvroDeserializationSchema.forGeneric(
-                AvroSchemaConverter.convertToSchema(rowType, schemaName), configs),
-            AvroToRowDataConverters.createRowConverter(rowType),
-            rowDataTypeInfo);
-      }
+    @Override
+    public EncodingFormat<SerializationSchema<RowData>> createEncodingFormat(
+            DynamicTableFactory.Context context, ReadableConfig formatOptions) {
 
-      @Override
-      public ChangelogMode getChangelogMode() {
-        return ChangelogMode.insertOnly();
-      }
-    };
-  }
+        FactoryUtil.validateFactoryOptions(this, formatOptions);
 
-  @Override
-  public EncodingFormat<SerializationSchema<RowData>> createEncodingFormat(
-      DynamicTableFactory.Context context, ReadableConfig formatOptions) {
+        String topic = context
+                .getConfiguration()
+                .getOptional(KAFKA_TOPIC)
+                .or(() -> formatOptions.getOptional(KAFKA_TOPIC))
+                .orElseThrow(
+                        () -> new ValidationException(
+                                String.format(
+                                        "Kafka topic not found among table %s options",
+                                        context.getObjectIdentifier().asSummaryString())));
 
-    FactoryUtil.validateFactoryOptions(this, formatOptions);
+        String schemaName = formatOptions.get(SCHEMA_NAME);
 
-    String topic =
-        context
-            .getConfiguration()
-            .getOptional(KAFKA_TOPIC)
-            .or(() -> formatOptions.getOptional(KAFKA_TOPIC))
-            .orElseThrow(
-                () ->
-                    new ValidationException(
-                        String.format(
-                            "Kafka topic not found among table %s options",
-                            context.getObjectIdentifier().asSummaryString())));
-    
-    String schemaName = formatOptions.get(SCHEMA_NAME);
+        Map<String, Object> configs = buildConfigs(formatOptions);
 
-    Map<String, Object> configs = buildConfigs(formatOptions);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(
+                    "createEncodingFormat() with topic {}, schemaName {} and configs {}",
+                    topic,
+                    schemaName,
+                    configs);
+        }
 
-    if (LOG.isDebugEnabled()) {
-      LOG.debug(
-          "createEncodingFormat() with topic {}, schemaName {} and configs {}",
-          topic,
-          schemaName,
-          configs);
+        return new EncodingFormat<SerializationSchema<RowData>>() {
+            @Override
+            public SerializationSchema<RowData> createRuntimeEncoder(
+                    DynamicTableSink.Context context, DataType consumedDataType) {
+                final RowType rowType = (RowType) consumedDataType.getLogicalType();
+                return new AvroRowDataSerializationSchema(
+                        rowType,
+                        GlueAvroSerializationSchema.forGeneric(
+                                AvroSchemaConverter.convertToSchema(rowType, schemaName), topic, configs),
+                        RowDataToAvroConverters.createConverter(rowType));
+            }
+
+            @Override
+            public ChangelogMode getChangelogMode() {
+                return ChangelogMode.insertOnly();
+            }
+        };
     }
 
-    return new EncodingFormat<SerializationSchema<RowData>>() {
-      @Override
-      public SerializationSchema<RowData> createRuntimeEncoder(
-          DynamicTableSink.Context context, DataType consumedDataType) {
-        final RowType rowType = (RowType) consumedDataType.getLogicalType();
-        return new AvroRowDataSerializationSchema(
-            rowType,
-            GlueAvroSerializationSchema.forGeneric(
-                AvroSchemaConverter.convertToSchema(rowType, schemaName), topic, configs),
-            RowDataToAvroConverters.createConverter(rowType));
-      }
+    @Override
+    public String factoryIdentifier() {
+        return IDENTIFIER;
+    }
 
-      @Override
-      public ChangelogMode getChangelogMode() {
-        return ChangelogMode.insertOnly();
-      }
-    };
-  }
+    @Override
+    public Set<ConfigOption<?>> requiredOptions() {
+        Set<ConfigOption<?>> options = new HashSet<>();
+        options.add(SCHEMA_NAME);
+        return options;
+    }
 
-  @Override
-  public String factoryIdentifier() {
-    return IDENTIFIER;
-  }
+    @Override
+    public Set<ConfigOption<?>> optionalOptions() {
+        Set<ConfigOption<?>> options = new HashSet<>();
+        options.add(KAFKA_TOPIC); // required for our tests, but not otherwise
+        options.add(PROPERTIES);
+        options.add(REGISTRY_NAME);
+        options.add(AWS_REGION);
+        options.add(AWS_ENDPOINT);
+        options.add(SCHEMA_AUTO_REGISTRATION_SETTING);
+        options.add(SCHEMA_NAMING_GENERATION_CLASS);
+        options.add(SECONDARY_DESERIALIZER);
+        return options;
+    }
 
-  @Override
-  public Set<ConfigOption<?>> requiredOptions() {
-    Set<ConfigOption<?>> options = new HashSet<>();
-    options.add(SCHEMA_NAME);
-    return options;
-  }
+    @Override
+    public Set<ConfigOption<?>> forwardOptions() {
+        Set<ConfigOption<?>> options = new HashSet<>();
+        options.add(REGISTRY_NAME);
+        options.add(PROPERTIES);
+        options.add(SCHEMA_NAME);
+        options.add(AWS_REGION);
+        options.add(AWS_ENDPOINT);
+        options.add(SCHEMA_AUTO_REGISTRATION_SETTING);
+        options.add(SCHEMA_NAMING_GENERATION_CLASS);
+        options.add(SECONDARY_DESERIALIZER);
+        return options;
+    }
 
-  @Override
-  public Set<ConfigOption<?>> optionalOptions() {
-    Set<ConfigOption<?>> options = new HashSet<>();
-    options.add(KAFKA_TOPIC); // required for our tests, but not otherwise
-    options.add(PROPERTIES);
-    options.add(REGISTRY_NAME);
-    options.add(AWS_REGION);
-    options.add(AWS_ENDPOINT);
-    options.add(SCHEMA_AUTO_REGISTRATION_SETTING);
-    options.add(SCHEMA_NAMING_GENERATION_CLASS);
-    options.add(SECONDARY_DESERIALIZER);
-    return options;
-  }
+    @NotNull
+    @VisibleForTesting
+    public static Map<String, Object> buildConfigs(ReadableConfig formatOptions) {
+        HashMap<String, Object> configs = new HashMap<>();
+        configs.put(AWS_REGION.key(), formatOptions.get(AWS_REGION));
+        configs.put(SCHEMA_NAME.key(), formatOptions.get(SCHEMA_NAME));
+        formatOptions.getOptional(PROPERTIES).ifPresent(configs::putAll);
+        formatOptions.getOptional(AWS_ENDPOINT).ifPresent(v -> configs.put(AWS_ENDPOINT.key(), v));
+        formatOptions.getOptional(REGISTRY_NAME).ifPresent(v -> configs.put(REGISTRY_NAME.key(), v));
+        formatOptions
+                .getOptional(SCHEMA_AUTO_REGISTRATION_SETTING)
+                .ifPresent(v -> configs.put(SCHEMA_AUTO_REGISTRATION_SETTING.key(), v));
+        formatOptions
+                .getOptional(SCHEMA_NAMING_GENERATION_CLASS)
+                .ifPresent(v -> configs.put(SCHEMA_NAMING_GENERATION_CLASS.key(), v));
+        formatOptions
+                .getOptional(SECONDARY_DESERIALIZER)
+                .ifPresent(v -> configs.put(SECONDARY_DESERIALIZER.key(), v));
 
-  @Override
-  public Set<ConfigOption<?>> forwardOptions() {
-    Set<ConfigOption<?>> options = new HashSet<>();
-    options.add(REGISTRY_NAME);
-    options.add(PROPERTIES);
-    options.add(SCHEMA_NAME);
-    options.add(AWS_REGION);
-    options.add(AWS_ENDPOINT);
-    options.add(SCHEMA_AUTO_REGISTRATION_SETTING);
-    options.add(SCHEMA_NAMING_GENERATION_CLASS);
-    options.add(SECONDARY_DESERIALIZER);
-    return options;
-  }
-
-  @NotNull
-  @VisibleForTesting
-  public static Map<String, Object> buildConfigs(ReadableConfig formatOptions) {
-    HashMap<String, Object> configs = new HashMap<>();
-    configs.put(AWS_REGION.key(), formatOptions.get(AWS_REGION));
-    configs.put(SCHEMA_NAME.key(), formatOptions.get(SCHEMA_NAME));
-    formatOptions.getOptional(PROPERTIES).ifPresent(configs::putAll);
-    formatOptions.getOptional(AWS_ENDPOINT).ifPresent(v -> configs.put(AWS_ENDPOINT.key(), v));
-    formatOptions.getOptional(REGISTRY_NAME).ifPresent(v -> configs.put(REGISTRY_NAME.key(), v));
-    formatOptions
-        .getOptional(SCHEMA_AUTO_REGISTRATION_SETTING)
-        .ifPresent(v -> configs.put(SCHEMA_AUTO_REGISTRATION_SETTING.key(), v));
-    formatOptions
-        .getOptional(SCHEMA_NAMING_GENERATION_CLASS)
-        .ifPresent(v -> configs.put(SCHEMA_NAMING_GENERATION_CLASS.key(), v));
-    formatOptions
-        .getOptional(SECONDARY_DESERIALIZER)
-        .ifPresent(v -> configs.put(SECONDARY_DESERIALIZER.key(), v));
-
-    return configs;
-  }
+        return configs;
+    }
 }

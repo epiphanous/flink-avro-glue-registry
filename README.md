@@ -52,7 +52,7 @@ CREATE TABLE user_created (
 )
 ```
 
-## Format Options
+### Format Options
 
 | Option                                  | Required | Forwarded |      Default       |  Type   | Description                                                                |
 |-----------------------------------------|:--------:|:---------:|:------------------:|:-------:|----------------------------------------------------------------------------|
@@ -68,3 +68,31 @@ CREATE TABLE user_created (
 
 Note that all options can be prefixed with `avro-glue.schema.registry` and all camel cased options can be dot
 cased (`avro-glue.schema.auto.registration.enabled` is equivalent to `avro-glue.schemaAutoRegistrationEnabled`).
+
+## Create tables with Debezium-Avro-Glue Format
+
+`debezium-avro-glue` is a wrapper around the `avro-glue` format that allows you to parse Debezium encoded messages. Debezium support is heavily inspired by `debezium-avro-confluent` and `debezium-avro-json` formats.
+
+```
+CREATE TABLE user_created (
+  id            STRING,
+  name          STRING,
+  email         STRING,
+  primary key (id)
+) WITH (
+  'connector'                = 'kafka',
+  'topic'                    = 'user_events',
+  'properties.bootstrap.servers' 
+                             = 'localhost:9092',
+    
+  'format'                   = 'debezium-avro-glue',
+  'avro-glue.schemaName'     = 'org.example.avro.UserEvent'
+  'avro-glue.region'         = 'us-east-1',
+  'avro-glue.registry'       = 'my-glue-registry',
+  'avro-glue.transport.name' = 'user_events'
+)
+```
+
+Format options are the same as the `avro-glue` format.
+
+

@@ -31,168 +31,125 @@ import org.slf4j.LoggerFactory;
 /** Tests for the {@link AvroGlueFormatFactory}. */
 class AvroGlueFormatFactoryTest {
 
-  static final Logger logger = LoggerFactory.getLogger(AvroGlueFormatFactoryTest.class);
+    static final Logger logger = LoggerFactory.getLogger(AvroGlueFormatFactoryTest.class);
 
-  private static final ResolvedSchema SCHEMA =
-      ResolvedSchema.of(
-          Column.physical("a", DataTypes.STRING()),
-          Column.physical("b", DataTypes.INT()),
-          Column.physical("c", DataTypes.BOOLEAN()));
-  private static final RowType ROW_TYPE = (RowType) SCHEMA.toPhysicalRowDataType().getLogicalType();
+    private static final ResolvedSchema SCHEMA = ResolvedSchema.of(
+            Column.physical("a", DataTypes.STRING()),
+            Column.physical("b", DataTypes.INT()),
+            Column.physical("c", DataTypes.BOOLEAN()));
+    private static final RowType ROW_TYPE = (RowType) SCHEMA.toPhysicalRowDataType().getLogicalType();
 
-  private static final String SCHEMA_STRING =
-      "{\n"
-          + "  \"type\": \"record\",\n"
-          + "  \"namespace\": \"my.avro\",\n"
-          + "  \"name\": \"test_record\",\n"
-          + "  \"fields\": [\n"
-          + "    {\n"
-          + "      \"name\": \"a\",\n"
-          + "      \"type\": [\n"
-          + "        \"null\",\n"
-          + "        \"string\"\n"
-          + "      ],\n"
-          + "      \"default\": null\n"
-          + "    },\n"
-          + "    {\n"
-          + "      \"name\": \"b\",\n"
-          + "      \"type\": [\n"
-          + "        \"null\",\n"
-          + "        \"int\"\n"
-          + "      ],\n"
-          + "      \"default\": null\n"
-          + "    },\n"
-          + "    {\n"
-          + "      \"name\": \"c\",\n"
-          + "      \"type\": [\n"
-          + "        \"null\",\n"
-          + "        \"boolean\"\n"
-          + "      ],\n"
-          + "      \"default\": null\n"
-          + "    }\n"
-          + "  ]\n"
-          + "}\n";
+    private static final String MY_SCHEMA_NAME = "my_schema";
 
-  private static final Schema AVRO_SCHEMA = new Schema.Parser().parse(SCHEMA_STRING);
+    @Test
+    void testDeserializationSchema() {
+        Map<String, Object> configs = new HashMap<>();
+        configs.put(SCHEMA_NAME.key(), MY_SCHEMA_NAME);
+        configs.put(AWS_REGION.key(), AWS_REGION.defaultValue());
 
-  private static final String MY_SCHEMA_NAME = AVRO_SCHEMA.getFullName();
+        final AvroRowDataDeserializationSchema expectedDeser = getDeserializer(configs);
+        final DynamicTableSource actualSource = FactoryMocks.createTableSource(SCHEMA, getDefaultOptions());
 
-  private static final Map<String, String> EXPECTED_OPTIONAL_PROPERTIES = new HashMap<>();
+        assertThat(actualSource).isInstanceOf(TestDynamicTableFactory.DynamicTableSourceMock.class);
 
-  @Test
-  void testDeserializationSchema() {
+        TestDynamicTableFactory.DynamicTableSourceMock scanSourceMock = (TestDynamicTableFactory.DynamicTableSourceMock) actualSource;
+        DeserializationSchema<RowData> actualDeser = scanSourceMock.valueFormat.createRuntimeDecoder(
+                ScanRuntimeProviderContext.INSTANCE, SCHEMA.toPhysicalRowDataType());
 
-    Map<String, Object> configs = new HashMap<>();
-    configs.put(SCHEMA_NAME.key(), MY_SCHEMA_NAME);
-    configs.put(AWS_REGION.key(), AWS_REGION.defaultValue());
+        assertThat(actualDeser).isEqualTo(expectedDeser);
+    }
 
-    final AvroRowDataDeserializationSchema expectedDeser = getDeserializer(configs);
-    final DynamicTableSource actualSource =
-        FactoryMocks.createTableSource(SCHEMA, getDefaultOptions());
+    @Test
+    void testSerializationSchema() {
+        Map<String, Object> configs = new HashMap<>();
+        configs.put(SCHEMA_NAME.key(), MY_SCHEMA_NAME);
+        configs.put(AWS_REGION.key(), AWS_REGION.defaultValue());
 
-    assertThat(actualSource).isInstanceOf(TestDynamicTableFactory.DynamicTableSourceMock.class);
+        final AvroRowDataSerializationSchema expectedSer = getSerializer("test-topic", configs);
 
-    TestDynamicTableFactory.DynamicTableSourceMock scanSourceMock =
-        (TestDynamicTableFactory.DynamicTableSourceMock) actualSource;
-    DeserializationSchema<RowData> actualDeser =
-        scanSourceMock.valueFormat.createRuntimeDecoder(
-            ScanRuntimeProviderContext.INSTANCE, SCHEMA.toPhysicalRowDataType());
+        final DynamicTableSink actualSink = FactoryMocks.createTableSink(SCHEMA, getDefaultOptions());
 
-    assertThat(actualDeser).isEqualTo(expectedDeser);
-  }
+        assertThat(actualSink).isInstanceOf(TestDynamicTableFactory.DynamicTableSinkMock.class);
 
-  @Test
-  void testSerializationSchema() {
-    Map<String, Object> configs = new HashMap<>();
-    configs.put(SCHEMA_NAME.key(), MY_SCHEMA_NAME);
-    configs.put(AWS_REGION.key(), AWS_REGION.defaultValue());
+        TestDynamicTableFactory.DynamicTableSinkMock sinkMock = (TestDynamicTableFactory.DynamicTableSinkMock) actualSink;
 
-    final AvroRowDataSerializationSchema expectedSer = getSerializer("test-topic", configs);
+        SerializationSchema<RowData> actualSer = sinkMock.valueFormat.createRuntimeEncoder(null,
+                SCHEMA.toPhysicalRowDataType());
 
-    final DynamicTableSink actualSink = FactoryMocks.createTableSink(SCHEMA, getDefaultOptions());
+        assertThat(actualSer).isEqualTo(expectedSer);
+    }
 
-    assertThat(actualSink).isInstanceOf(TestDynamicTableFactory.DynamicTableSinkMock.class);
+    @Test
+    void testMissingSchemaName() {
+        Map<String, String> options = getDefaultOptions();
+        options.remove(IDENTIFIER + "." + SCHEMA_NAME.key());
+        assertThatThrownBy(() -> FactoryMocks.createTableSink(SCHEMA, options))
+                .isInstanceOf(ValidationException.class);
+    }
 
-    TestDynamicTableFactory.DynamicTableSinkMock sinkMock =
-        (TestDynamicTableFactory.DynamicTableSinkMock) actualSink;
+    @Test
+    void testMissingTopicName() {
+        Map<String, String> options = getDefaultOptions();
+        options.remove(IDENTIFIER + "." + KAFKA_TOPIC.key());
+        assertThatThrownBy(() -> FactoryMocks.createTableSink(SCHEMA, options))
+                .isInstanceOf(ValidationException.class)
+                .hasStackTraceContaining("Kafka topic not found among");
+    }
 
-    SerializationSchema<RowData> actualSer =
-        sinkMock.valueFormat.createRuntimeEncoder(null, SCHEMA.toPhysicalRowDataType());
+    @Test
+    void factoryIdentifier() {
+        assertThat(getFactory().factoryIdentifier()).isEqualTo(IDENTIFIER);
+    }
 
-    assertThat(actualSer).isEqualTo(expectedSer);
-  }
+    @Test
+    void testRequiredOptions() {
+        Set<ConfigOption<?>> options = getFactory().requiredOptions();
+        assertThat(options).hasSize(1).contains(SCHEMA_NAME);
+    }
 
-  @Test
-  void testMissingSchemaName() {
-    Map<String, String> options = getDefaultOptions();
-    options.remove(IDENTIFIER + "." + SCHEMA_NAME.key());
-    assertThatThrownBy(() -> FactoryMocks.createTableSink(SCHEMA, options))
-        .isInstanceOf(ValidationException.class);
-  }
+    @Test
+    void testOptionalOptions() {
+        Set<ConfigOption<?>> options = getFactory().optionalOptions();
+        assertThat(options).hasSize(8).doesNotContain(SCHEMA_NAME);
+    }
 
-  @Test
-  void testMissingTopicName() {
-    Map<String, String> options = getDefaultOptions();
-    options.remove(IDENTIFIER + "." + KAFKA_TOPIC.key());
-    assertThatThrownBy(() -> FactoryMocks.createTableSink(SCHEMA, options))
-        .isInstanceOf(ValidationException.class)
-        .hasStackTraceContaining("Kafka topic not found among");
-  }
+    @Test
+    void testForwardOptions() {
+        Set<ConfigOption<?>> options = getFactory().forwardOptions();
+        assertThat(options).hasSize(8).doesNotContain(KAFKA_TOPIC);
+    }
 
-  @Test
-  void factoryIdentifier() {
-    assertThat(getFactory().factoryIdentifier()).isEqualTo(IDENTIFIER);
-  }
+    // test utils
 
-  @Test
-  void testRequiredOptions() {
-    Set<ConfigOption<?>> options = getFactory().requiredOptions();
-    assertThat(options).hasSize(1).contains(SCHEMA_NAME);
-  }
+    @NotNull
+    private Map<String, String> getDefaultOptions() {
+        Map<String, String> options = new HashMap<>();
+        options.put("connector", TestDynamicTableFactory.IDENTIFIER);
+        options.put("target", "MyTarget");
+        options.put("buffer-size", "1000");
+        options.put("format", IDENTIFIER);
+        options.put("avro-glue.topic", "test-topic");
+        options.put("avro-glue.schemaName", MY_SCHEMA_NAME);
+        return options;
+    }
 
-  @Test
-  void testOptionalOptions() {
-    Set<ConfigOption<?>> options = getFactory().optionalOptions();
-    assertThat(options).hasSize(8).doesNotContain(SCHEMA_NAME);
-  }
+    AvroRowDataSerializationSchema getSerializer(String transportName, Map<String, Object> configs) {
+        return new AvroRowDataSerializationSchema(
+                ROW_TYPE,
+                GlueAvroSerializationSchema.forGeneric(
+                        AvroSchemaConverter.convertToSchema(ROW_TYPE, MY_SCHEMA_NAME), transportName, configs),
+                RowDataToAvroConverters.createConverter(ROW_TYPE));
+    }
 
-  @Test
-  void testForwardOptions() {
-    Set<ConfigOption<?>> options = getFactory().forwardOptions();
-    assertThat(options).hasSize(8).doesNotContain(KAFKA_TOPIC);
-  }
+    AvroRowDataDeserializationSchema getDeserializer(Map<String, Object> configs) {
+        return new AvroRowDataDeserializationSchema(
+                GlueAvroDeserializationSchema.forGeneric(AvroSchemaConverter.convertToSchema(ROW_TYPE, MY_SCHEMA_NAME),
+                        configs),
+                AvroToRowDataConverters.createRowConverter(ROW_TYPE),
+                InternalTypeInfo.of(ROW_TYPE));
+    }
 
-  // test utils
-
-  @NotNull
-  private Map<String, String> getDefaultOptions() {
-    Map<String, String> options = new HashMap<>();
-    options.put("connector", TestDynamicTableFactory.IDENTIFIER);
-    options.put("target", "MyTarget");
-    options.put("buffer-size", "1000");
-    options.put("format", IDENTIFIER);
-    options.put("avro-glue.topic", "test-topic");
-    options.put("avro-glue.schemaName", MY_SCHEMA_NAME);
-    return options;
-  }
-
-  AvroRowDataSerializationSchema getSerializer(String transportName, Map<String, Object> configs) {
-    return new AvroRowDataSerializationSchema(
-        ROW_TYPE,
-        GlueAvroSerializationSchema.forGeneric(
-            AvroSchemaConverter.convertToSchema(ROW_TYPE, MY_SCHEMA_NAME), transportName, configs),
-        RowDataToAvroConverters.createConverter(ROW_TYPE));
-  }
-
-  AvroRowDataDeserializationSchema getDeserializer(Map<String, Object> configs) {
-    return new AvroRowDataDeserializationSchema(
-        GlueAvroDeserializationSchema.forGeneric(
-            AvroSchemaConverter.convertToSchema(ROW_TYPE, MY_SCHEMA_NAME), configs),
-        AvroToRowDataConverters.createRowConverter(ROW_TYPE),
-        InternalTypeInfo.of(ROW_TYPE));
-  }
-
-  AvroGlueFormatFactory getFactory() {
-    return new AvroGlueFormatFactory();
-  }
+    AvroGlueFormatFactory getFactory() {
+        return new AvroGlueFormatFactory();
+    }
 }

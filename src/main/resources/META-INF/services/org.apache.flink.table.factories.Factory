@@ -1,1 +1,2 @@
 io.epiphanous.flink.formats.avro.registry.glue.AvroGlueFormatFactory
+io.epiphanous.flink.formats.avro.registry.glue.debezium.DebeziumAvroGlueFormatFactory
