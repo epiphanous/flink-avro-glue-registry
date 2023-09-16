@@ -9,15 +9,6 @@ import software.amazon.awssdk.regions.Region;
 /** Options for Glue Schema Registry Avro format. */
 public class AvroGlueFormatOptions {
 
-  static String dotCase(String name) {
-    return name.replaceAll(
-            String.format(
-                "%s|%s|%s",
-                "(?<=[A-Z])(?=[A-Z][a-z])", "(?<=[^A-Z])(?=[A-Z])", "(?<=[A-Za-z])(?=[^A-Za-z])"),
-            ".")
-        .toLowerCase();
-  }
-
   public static final ConfigOption<String> KAFKA_TOPIC =
       ConfigOptions.key("topic")
           .stringType()
@@ -25,7 +16,6 @@ public class AvroGlueFormatOptions {
           .withDescription(
               "This is not used as a config for the format, but to pull in the "
                   + "table kafka connector topic configuration.");
-
   public static final ConfigOption<String> SCHEMA_NAME =
       ConfigOptions.key(AWSSchemaRegistryConstants.SCHEMA_NAME)
           .stringType()
@@ -37,7 +27,6 @@ public class AvroGlueFormatOptions {
           .withDescription(
               "The schema name to register the schema under. This is required "
                   + " and should be the same as the avro schema's full name.");
-
   public static final ConfigOption<String> AWS_REGION =
       ConfigOptions.key(AWSSchemaRegistryConstants.AWS_REGION)
           .stringType()
@@ -46,7 +35,6 @@ public class AvroGlueFormatOptions {
           .withDescription(
               "The AWS Region your Glue schema registry operates in (defaults "
                   + "to 'us-east-1').");
-
   public static final ConfigOption<String> AWS_ENDPOINT =
       ConfigOptions.key(AWSSchemaRegistryConstants.AWS_ENDPOINT)
           .stringType()
@@ -56,7 +44,6 @@ public class AvroGlueFormatOptions {
               "The AWS Glue endpoint. Normally inferred "
                   + "automatically from your AWS Region setting, but useful for "
                   + "testing with localstack.");
-
   public static final ConfigOption<String> REGISTRY_NAME =
       ConfigOptions.key(AWSSchemaRegistryConstants.REGISTRY_NAME)
           .stringType()
@@ -68,7 +55,6 @@ public class AvroGlueFormatOptions {
                   + " to "
                   + AWSSchemaRegistryConstants.DEFAULT_REGISTRY_NAME
                   + ".");
-
   public static final ConfigOption<String> SCHEMA_AUTO_REGISTRATION_SETTING =
       ConfigOptions.key(AWSSchemaRegistryConstants.SCHEMA_AUTO_REGISTRATION_SETTING)
           .stringType()
@@ -81,7 +67,6 @@ public class AvroGlueFormatOptions {
           .withDescription(
               "If true, schemas missing from the registry will be "
                   + "auto-registered on serialization. Default is false.");
-
   public static final ConfigOption<String> SCHEMA_NAMING_GENERATION_CLASS =
       ConfigOptions.key(AWSSchemaRegistryConstants.SCHEMA_NAMING_GENERATION_CLASS)
           .stringType()
@@ -108,7 +93,6 @@ public class AvroGlueFormatOptions {
               "The class name of a fallback deserializer that will "
                   + "be used when Glue can't decode a message. Useful for transitioning"
                   + " from another schema registry, like Confluent.");
-
   public static final ConfigOption<Map<String, String>> PROPERTIES =
       ConfigOptions.key("properties")
           .mapType()
@@ -121,4 +105,13 @@ public class AvroGlueFormatOptions {
                   + "Flink options have higher precedence.");
 
   private AvroGlueFormatOptions() {}
+
+  static String dotCase(String name) {
+    return name.replaceAll(
+            String.format(
+                "%s|%s|%s",
+                "(?<=[A-Z])(?=[A-Z][a-z])", "(?<=[^A-Z])(?=[A-Z])", "(?<=[A-Za-z])(?=[^A-Za-z])"),
+            ".")
+        .toLowerCase();
+  }
 }

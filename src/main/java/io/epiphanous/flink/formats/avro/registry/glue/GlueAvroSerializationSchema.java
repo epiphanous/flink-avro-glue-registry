@@ -16,6 +16,7 @@ import org.apache.flink.formats.avro.SchemaCoder;
  * @param <T> The class of the records for this deserialization schema
  */
 public class GlueAvroSerializationSchema<T> extends RegistryAvroSerializationSchema<T> {
+
   private GlueAvroSerializationSchema(
       Class<T> recordClazz, Schema schema, SchemaCoder.SchemaCoderProvider schemaCoderProvider) {
     super(recordClazz, schema, schemaCoderProvider);

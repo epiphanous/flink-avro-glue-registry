@@ -17,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
  * @param <T> The class of the records for this deserialization schema
  */
 public class GlueAvroDeserializationSchema<T> extends RegistryAvroDeserializationSchema<T> {
+
   private GlueAvroDeserializationSchema(
       Class<T> recordClazz,
       @Nullable Schema reader,

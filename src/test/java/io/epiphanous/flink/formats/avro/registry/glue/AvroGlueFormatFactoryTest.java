@@ -1,16 +1,23 @@
 package io.epiphanous.flink.formats.avro.registry.glue;
 
 import static io.epiphanous.flink.formats.avro.registry.glue.AvroGlueFormatFactory.IDENTIFIER;
-import static io.epiphanous.flink.formats.avro.registry.glue.AvroGlueFormatOptions.*;
-import static org.assertj.core.api.Assertions.*;
+import static io.epiphanous.flink.formats.avro.registry.glue.AvroGlueFormatOptions.AWS_REGION;
+import static io.epiphanous.flink.formats.avro.registry.glue.AvroGlueFormatOptions.KAFKA_TOPIC;
+import static io.epiphanous.flink.formats.avro.registry.glue.AvroGlueFormatOptions.SCHEMA_NAME;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import javax.validation.constraints.NotNull;
-import org.apache.avro.Schema;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.api.common.serialization.SerializationSchema;
 import org.apache.flink.configuration.ConfigOption;
-import org.apache.flink.formats.avro.*;
+import org.apache.flink.formats.avro.AvroRowDataDeserializationSchema;
+import org.apache.flink.formats.avro.AvroRowDataSerializationSchema;
+import org.apache.flink.formats.avro.AvroToRowDataConverters;
+import org.apache.flink.formats.avro.RowDataToAvroConverters;
 import org.apache.flink.formats.avro.typeutils.AvroSchemaConverter;
 import org.apache.flink.table.api.DataTypes;
 import org.apache.flink.table.api.ValidationException;
@@ -40,48 +47,10 @@ class AvroGlueFormatFactoryTest {
           Column.physical("c", DataTypes.BOOLEAN()));
   private static final RowType ROW_TYPE = (RowType) SCHEMA.toPhysicalRowDataType().getLogicalType();
 
-  private static final String SCHEMA_STRING =
-      "{\n"
-          + "  \"type\": \"record\",\n"
-          + "  \"namespace\": \"my.avro\",\n"
-          + "  \"name\": \"test_record\",\n"
-          + "  \"fields\": [\n"
-          + "    {\n"
-          + "      \"name\": \"a\",\n"
-          + "      \"type\": [\n"
-          + "        \"null\",\n"
-          + "        \"string\"\n"
-          + "      ],\n"
-          + "      \"default\": null\n"
-          + "    },\n"
-          + "    {\n"
-          + "      \"name\": \"b\",\n"
-          + "      \"type\": [\n"
-          + "        \"null\",\n"
-          + "        \"int\"\n"
-          + "      ],\n"
-          + "      \"default\": null\n"
-          + "    },\n"
-          + "    {\n"
-          + "      \"name\": \"c\",\n"
-          + "      \"type\": [\n"
-          + "        \"null\",\n"
-          + "        \"boolean\"\n"
-          + "      ],\n"
-          + "      \"default\": null\n"
-          + "    }\n"
-          + "  ]\n"
-          + "}\n";
-
-  private static final Schema AVRO_SCHEMA = new Schema.Parser().parse(SCHEMA_STRING);
-
-  private static final String MY_SCHEMA_NAME = AVRO_SCHEMA.getFullName();
-
-  private static final Map<String, String> EXPECTED_OPTIONAL_PROPERTIES = new HashMap<>();
+  private static final String MY_SCHEMA_NAME = "my_schema";
 
   @Test
   void testDeserializationSchema() {
-
     Map<String, Object> configs = new HashMap<>();
     configs.put(SCHEMA_NAME.key(), MY_SCHEMA_NAME);
     configs.put(AWS_REGION.key(), AWS_REGION.defaultValue());
