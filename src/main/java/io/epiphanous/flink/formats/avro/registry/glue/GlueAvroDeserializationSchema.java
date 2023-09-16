@@ -8,11 +8,10 @@ import org.apache.flink.formats.avro.SchemaCoder;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * A similar implementation to
- * {@link
+ * A similar implementation to {@link
  * com.amazonaws.services.schemaregistry.flink.avro.GlueSchemaRegistryAvroDeserializationSchema} to
- * create a generic glue deserializer implementation, leveraging our thin wrapper
- * {@link GlueAvroCoderProvider}. This makes it possible to create a working glue schema registry
+ * create a generic glue deserializer implementation, leveraging our thin wrapper {@link
+ * GlueAvroCoderProvider}. This makes it possible to create a working glue schema registry
  * deserializer that can be tested.
  *
  * @param <T> The class of the records for this deserialization schema

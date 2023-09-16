@@ -23,12 +23,11 @@ import org.apache.flink.types.RowKind;
 import org.apache.flink.util.Collector;
 
 /**
- * Deserialization schema from Debezium Avro to Flink Table/SQL internal data structure
- * {@link RowData}. The deserialization schema knows Debezium's schema definition and can extract
- * the database data and convert into {@link RowData} with {@link RowKind}. Deserializes a
- * <code>byte[]
- * </code> message as a JSON object and reads the specified fields. Failures
- * during deserialization are forwarded as wrapped IOExceptions.
+ * Deserialization schema from Debezium Avro to Flink Table/SQL internal data structure {@link
+ * RowData}. The deserialization schema knows Debezium's schema definition and can extract the
+ * database data and convert into {@link RowData} with {@link RowKind}. Deserializes a <code>byte[]
+ * </code> message as a JSON object and reads the specified fields. Failures during deserialization
+ * are forwarded as wrapped IOExceptions.
  *
  * @see <a href="https://debezium.io/">Debezium</a>
  */
@@ -37,21 +36,16 @@ public final class DebeziumAvroGlueDeserializationSchema implements Deserializat
 
   private static final long serialVersionUID = 1L;
 
-  /**
-   * snapshot read.
-   */
+  /** snapshot read. */
   private static final String OP_READ = "r";
-  /**
-   * insert operation.
-   */
+
+  /** insert operation. */
   private static final String OP_CREATE = "c";
-  /**
-   * update operation.
-   */
+
+  /** update operation. */
   private static final String OP_UPDATE = "u";
-  /**
-   * delete operation.
-   */
+
+  /** delete operation. */
   private static final String OP_DELETE = "d";
 
   private static final String REPLICA_IDENTITY_EXCEPTION =
@@ -59,30 +53,32 @@ public final class DebeziumAvroGlueDeserializationSchema implements Deserializat
           + "if you are using Debezium Postgres Connector, "
           + "please check that the Postgres table has REPLICA IDENTITY set to FULL level.";
 
-  /**
-   * The deserializer to deserialize Debezium Avro data.
-   */
+  /** The deserializer to deserialize Debezium Avro data. */
   private final AvroRowDataDeserializationSchema avroDeserializer;
 
-  /**
-   * TypeInformation of the produced {@link RowData}.
-   */
+  /** TypeInformation of the produced {@link RowData}. */
   private final TypeInformation<RowData> producedTypeInfo;
 
-  public DebeziumAvroGlueDeserializationSchema(RowType rowType,
-      TypeInformation<RowData> producedTypeInfo, String schemaName, Map<String, Object> config) {
+  public DebeziumAvroGlueDeserializationSchema(
+      RowType rowType,
+      TypeInformation<RowData> producedTypeInfo,
+      String schemaName,
+      Map<String, Object> config) {
     this.producedTypeInfo = producedTypeInfo;
 
     RowType debeziumAvroRowType = createDebeziumAvroRowType(fromLogicalToDataType(rowType));
-    Schema debeziumAvroSchema = AvroSchemaConverter.convertToSchema(debeziumAvroRowType,
-        schemaName);
-    this.avroDeserializer = new AvroRowDataDeserializationSchema(
-        GlueAvroDeserializationSchema.forGeneric(debeziumAvroSchema, config),
-        AvroToRowDataConverters.createRowConverter(debeziumAvroRowType), producedTypeInfo);
+    Schema debeziumAvroSchema =
+        AvroSchemaConverter.convertToSchema(debeziumAvroRowType, schemaName);
+    this.avroDeserializer =
+        new AvroRowDataDeserializationSchema(
+            GlueAvroDeserializationSchema.forGeneric(debeziumAvroSchema, config),
+            AvroToRowDataConverters.createRowConverter(debeziumAvroRowType),
+            producedTypeInfo);
   }
 
   @VisibleForTesting
-  DebeziumAvroGlueDeserializationSchema(TypeInformation<RowData> producedTypeInfo,
+  DebeziumAvroGlueDeserializationSchema(
+      TypeInformation<RowData> producedTypeInfo,
       AvroRowDataDeserializationSchema avroDeserializer) {
     this.producedTypeInfo = producedTypeInfo;
     this.avroDeserializer = avroDeserializer;
@@ -130,8 +126,9 @@ public final class DebeziumAvroGlueDeserializationSchema implements Deserializat
         out.collect(before);
       } else {
         throw new IOException(
-            format("Unknown \"op\" value \"%s\". The Debezium Avro message is '%s'", op,
-                new String(message)));
+            format(
+                "Unknown \"op\" value \"%s\". The Debezium Avro message is '%s'",
+                op, new String(message)));
       }
     } catch (Throwable t) {
       // a big try catch to protect the processing.
@@ -158,8 +155,8 @@ public final class DebeziumAvroGlueDeserializationSchema implements Deserializat
       return false;
     }
     DebeziumAvroGlueDeserializationSchema that = (DebeziumAvroGlueDeserializationSchema) o;
-    return Objects.equals(avroDeserializer, that.avroDeserializer) && Objects.equals(
-        producedTypeInfo, that.producedTypeInfo);
+    return Objects.equals(avroDeserializer, that.avroDeserializer)
+        && Objects.equals(producedTypeInfo, that.producedTypeInfo);
   }
 
   @Override

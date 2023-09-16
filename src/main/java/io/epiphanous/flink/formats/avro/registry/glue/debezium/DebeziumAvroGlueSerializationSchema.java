@@ -30,38 +30,35 @@ public class DebeziumAvroGlueSerializationSchema implements SerializationSchema<
 
   private static final long serialVersionUID = 1L;
 
-  /**
-   * insert operation.
-   */
+  /** insert operation. */
   private static final StringData OP_INSERT = StringData.fromString("c");
-  /**
-   * delete operation.
-   */
+
+  /** delete operation. */
   private static final StringData OP_DELETE = StringData.fromString("d");
 
-  /**
-   * The deserializer to deserialize Debezium Avro data.
-   */
+  /** The deserializer to deserialize Debezium Avro data. */
   private final AvroRowDataSerializationSchema avroSerializer;
 
   private transient GenericRowData outputReuse;
 
-  public DebeziumAvroGlueSerializationSchema(RowType rowType, String topic,
-      Map<String, Object> config) {
+  public DebeziumAvroGlueSerializationSchema(
+      RowType rowType, String topic, Map<String, Object> config) {
     RowType debeziumAvroRowType = createDebeziumAvroRowType(fromLogicalToDataType(rowType));
     Schema schema = AvroSchemaConverter.convertToSchema(debeziumAvroRowType);
-    SerializationSchema<GenericRecord> nestedSchema = GlueAvroSerializationSchema.forGeneric(schema,
-        topic, config);
+    SerializationSchema<GenericRecord> nestedSchema =
+        GlueAvroSerializationSchema.forGeneric(schema, topic, config);
 
-    this.avroSerializer = new AvroRowDataSerializationSchema(debeziumAvroRowType, nestedSchema,
-        RowDataToAvroConverters.createConverter(debeziumAvroRowType));
+    this.avroSerializer =
+        new AvroRowDataSerializationSchema(
+            debeziumAvroRowType,
+            nestedSchema,
+            RowDataToAvroConverters.createConverter(debeziumAvroRowType));
   }
 
   @VisibleForTesting
   DebeziumAvroGlueSerializationSchema(AvroRowDataSerializationSchema avroSerializer) {
     this.avroSerializer = avroSerializer;
   }
-
 
   @Override
   public void open(InitializationContext context) throws Exception {

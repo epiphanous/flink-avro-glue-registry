@@ -39,9 +39,8 @@ import org.apache.flink.table.types.DataType;
 import org.apache.flink.table.types.logical.RowType;
 import org.slf4j.Logger;
 
-public abstract class AbstractAvroGlueFormatFactory implements DeserializationFormatFactory,
-    SerializationFormatFactory {
-
+public abstract class AbstractAvroGlueFormatFactory
+    implements DeserializationFormatFactory, SerializationFormatFactory {
 
   @NotNull
   @VisibleForTesting
@@ -52,11 +51,14 @@ public abstract class AbstractAvroGlueFormatFactory implements DeserializationFo
     formatOptions.getOptional(PROPERTIES).ifPresent(configs::putAll);
     formatOptions.getOptional(AWS_ENDPOINT).ifPresent(v -> configs.put(AWS_ENDPOINT.key(), v));
     formatOptions.getOptional(REGISTRY_NAME).ifPresent(v -> configs.put(REGISTRY_NAME.key(), v));
-    formatOptions.getOptional(SCHEMA_AUTO_REGISTRATION_SETTING)
+    formatOptions
+        .getOptional(SCHEMA_AUTO_REGISTRATION_SETTING)
         .ifPresent(v -> configs.put(SCHEMA_AUTO_REGISTRATION_SETTING.key(), v));
-    formatOptions.getOptional(SCHEMA_NAMING_GENERATION_CLASS)
+    formatOptions
+        .getOptional(SCHEMA_NAMING_GENERATION_CLASS)
         .ifPresent(v -> configs.put(SCHEMA_NAMING_GENERATION_CLASS.key(), v));
-    formatOptions.getOptional(SECONDARY_DESERIALIZER)
+    formatOptions
+        .getOptional(SECONDARY_DESERIALIZER)
         .ifPresent(v -> configs.put(SECONDARY_DESERIALIZER.key(), v));
 
     return configs;
@@ -67,11 +69,14 @@ public abstract class AbstractAvroGlueFormatFactory implements DeserializationFo
 
   protected abstract Logger getLogger();
 
-  protected abstract DeserializationSchema<RowData> getDeserializationSchema(RowType rowType,
-      TypeInformation<RowData> rowDataTypeInfo, String schemaName, Map<String, Object> configs);
+  protected abstract DeserializationSchema<RowData> getDeserializationSchema(
+      RowType rowType,
+      TypeInformation<RowData> rowDataTypeInfo,
+      String schemaName,
+      Map<String, Object> configs);
 
-  protected abstract SerializationSchema<RowData> getSerializationSchema(RowType rowType,
-      String schemaName, String topic, Map<String, Object> configs);
+  protected abstract SerializationSchema<RowData> getSerializationSchema(
+      RowType rowType, String schemaName, String topic, Map<String, Object> configs);
 
   protected abstract ChangelogMode changelogMode();
 
@@ -86,18 +91,18 @@ public abstract class AbstractAvroGlueFormatFactory implements DeserializationFo
     Map<String, Object> configs = buildConfigs(formatOptions);
 
     if (getLogger().isDebugEnabled()) {
-      getLogger().debug("createDecodingFormat() with schemaName {} and configs {}", schemaName,
-          configs);
+      getLogger()
+          .debug("createDecodingFormat() with schemaName {} and configs {}", schemaName, configs);
     }
 
     return new ProjectableDecodingFormat<>() {
       @Override
-      public DeserializationSchema<RowData> createRuntimeDecoder(DynamicTableSource.Context context,
-          DataType producedDataType, int[][] projections) {
+      public DeserializationSchema<RowData> createRuntimeDecoder(
+          DynamicTableSource.Context context, DataType producedDataType, int[][] projections) {
         producedDataType = Projection.of(projections).project(producedDataType);
         final RowType rowType = (RowType) producedDataType.getLogicalType();
-        final TypeInformation<RowData> rowDataTypeInfo = context.createTypeInformation(
-            producedDataType);
+        final TypeInformation<RowData> rowDataTypeInfo =
+            context.createTypeInformation(producedDataType);
         return getDeserializationSchema(rowType, rowDataTypeInfo, schemaName, configs);
       }
 
@@ -114,24 +119,35 @@ public abstract class AbstractAvroGlueFormatFactory implements DeserializationFo
 
     FactoryUtil.validateFactoryOptions(this, formatOptions);
 
-    String topic = context.getConfiguration().getOptional(KAFKA_TOPIC)
-        .or(() -> formatOptions.getOptional(KAFKA_TOPIC)).orElseThrow(() -> new ValidationException(
-            String.format("Kafka topic not found among table %s options",
-                context.getObjectIdentifier().asSummaryString())));
+    String topic =
+        context
+            .getConfiguration()
+            .getOptional(KAFKA_TOPIC)
+            .or(() -> formatOptions.getOptional(KAFKA_TOPIC))
+            .orElseThrow(
+                () ->
+                    new ValidationException(
+                        String.format(
+                            "Kafka topic not found among table %s options",
+                            context.getObjectIdentifier().asSummaryString())));
 
     String schemaName = formatOptions.get(SCHEMA_NAME);
 
     Map<String, Object> configs = buildConfigs(formatOptions);
 
     if (getLogger().isDebugEnabled()) {
-      getLogger().debug("createEncodingFormat() with topic {}, schemaName {} and configs {}", topic,
-          schemaName, configs);
+      getLogger()
+          .debug(
+              "createEncodingFormat() with topic {}, schemaName {} and configs {}",
+              topic,
+              schemaName,
+              configs);
     }
 
     return new EncodingFormat<>() {
       @Override
-      public SerializationSchema<RowData> createRuntimeEncoder(DynamicTableSink.Context context,
-          DataType consumedDataType) {
+      public SerializationSchema<RowData> createRuntimeEncoder(
+          DynamicTableSink.Context context, DataType consumedDataType) {
         final RowType rowType = (RowType) consumedDataType.getLogicalType();
         return getSerializationSchema(rowType, schemaName, topic, configs);
       }
@@ -150,14 +166,28 @@ public abstract class AbstractAvroGlueFormatFactory implements DeserializationFo
 
   @Override
   public Set<ConfigOption<?>> optionalOptions() {
-    return createOptions(KAFKA_TOPIC, PROPERTIES, REGISTRY_NAME, AWS_REGION, AWS_ENDPOINT,
-        SCHEMA_AUTO_REGISTRATION_SETTING, SCHEMA_NAMING_GENERATION_CLASS, SECONDARY_DESERIALIZER);
+    return createOptions(
+        KAFKA_TOPIC,
+        PROPERTIES,
+        REGISTRY_NAME,
+        AWS_REGION,
+        AWS_ENDPOINT,
+        SCHEMA_AUTO_REGISTRATION_SETTING,
+        SCHEMA_NAMING_GENERATION_CLASS,
+        SECONDARY_DESERIALIZER);
   }
 
   @Override
   public Set<ConfigOption<?>> forwardOptions() {
-    return createOptions(REGISTRY_NAME, PROPERTIES, SCHEMA_NAME, AWS_REGION, AWS_ENDPOINT,
-        SCHEMA_AUTO_REGISTRATION_SETTING, SCHEMA_NAMING_GENERATION_CLASS, SECONDARY_DESERIALIZER);
+    return createOptions(
+        REGISTRY_NAME,
+        PROPERTIES,
+        SCHEMA_NAME,
+        AWS_REGION,
+        AWS_ENDPOINT,
+        SCHEMA_AUTO_REGISTRATION_SETTING,
+        SCHEMA_NAMING_GENERATION_CLASS,
+        SECONDARY_DESERIALIZER);
   }
 
   private Set<ConfigOption<?>> createOptions(ConfigOption<?>... configOptions) {

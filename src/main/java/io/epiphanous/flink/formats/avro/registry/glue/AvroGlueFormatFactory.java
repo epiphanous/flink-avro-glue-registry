@@ -35,17 +35,24 @@ public class AvroGlueFormatFactory extends AbstractAvroGlueFormatFactory {
   }
 
   @Override
-  protected DeserializationSchema<RowData> getDeserializationSchema(RowType rowType,
-      TypeInformation<RowData> rowDataTypeInfo, String schemaName, Map<String, Object> configs) {
-    return new AvroRowDataDeserializationSchema(GlueAvroDeserializationSchema.forGeneric(
-        AvroSchemaConverter.convertToSchema(rowType, schemaName), configs),
-        AvroToRowDataConverters.createRowConverter(rowType), rowDataTypeInfo);
+  protected DeserializationSchema<RowData> getDeserializationSchema(
+      RowType rowType,
+      TypeInformation<RowData> rowDataTypeInfo,
+      String schemaName,
+      Map<String, Object> configs) {
+    return new AvroRowDataDeserializationSchema(
+        GlueAvroDeserializationSchema.forGeneric(
+            AvroSchemaConverter.convertToSchema(rowType, schemaName), configs),
+        AvroToRowDataConverters.createRowConverter(rowType),
+        rowDataTypeInfo);
   }
 
-  protected SerializationSchema<RowData> getSerializationSchema(RowType rowType, String schemaName,
-      String topic, Map<String, Object> configs) {
-    return new AvroRowDataSerializationSchema(rowType, GlueAvroSerializationSchema.forGeneric(
-        AvroSchemaConverter.convertToSchema(rowType, schemaName), topic, configs),
+  protected SerializationSchema<RowData> getSerializationSchema(
+      RowType rowType, String schemaName, String topic, Map<String, Object> configs) {
+    return new AvroRowDataSerializationSchema(
+        rowType,
+        GlueAvroSerializationSchema.forGeneric(
+            AvroSchemaConverter.convertToSchema(rowType, schemaName), topic, configs),
         RowDataToAvroConverters.createConverter(rowType));
   }
 
@@ -53,6 +60,4 @@ public class AvroGlueFormatFactory extends AbstractAvroGlueFormatFactory {
   protected ChangelogMode changelogMode() {
     return ChangelogMode.insertOnly();
   }
-
-
 }

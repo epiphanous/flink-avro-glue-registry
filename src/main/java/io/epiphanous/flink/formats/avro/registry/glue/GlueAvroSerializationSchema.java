@@ -7,11 +7,10 @@ import org.apache.flink.formats.avro.RegistryAvroSerializationSchema;
 import org.apache.flink.formats.avro.SchemaCoder;
 
 /**
- * A similar implementation to
- * {@link
+ * A similar implementation to {@link
  * com.amazonaws.services.schemaregistry.flink.avro.GlueSchemaRegistryAvroSerializationSchema} to
- * create a generic glue serializer implementation, leveraging our thin wrapper
- * {@link GlueAvroCoderProvider}. This makes it possible to create a working glue schema registry
+ * create a generic glue serializer implementation, leveraging our thin wrapper {@link
+ * GlueAvroCoderProvider}. This makes it possible to create a working glue schema registry
  * serializer that can be tested.
  *
  * @param <T> The class of the records for this deserialization schema

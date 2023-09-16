@@ -23,15 +23,14 @@ import org.apache.flink.table.types.logical.RowType;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
-/**
- * Tests for {@link DebeziumAvroGlueFormatFactory}.
- */
+/** Tests for {@link DebeziumAvroGlueFormatFactory}. */
 class DebeziumAvroGlueFormatFactoryTest {
 
-  private static final ResolvedSchema SCHEMA = ResolvedSchema.of(
-      Column.physical("a", DataTypes.STRING()),
-      Column.physical("b", DataTypes.INT()),
-      Column.physical("c", DataTypes.BOOLEAN()));
+  private static final ResolvedSchema SCHEMA =
+      ResolvedSchema.of(
+          Column.physical("a", DataTypes.STRING()),
+          Column.physical("b", DataTypes.INT()),
+          Column.physical("c", DataTypes.BOOLEAN()));
 
   private static final RowType ROW_TYPE = (RowType) SCHEMA.toPhysicalRowDataType().getLogicalType();
 
@@ -43,19 +42,19 @@ class DebeziumAvroGlueFormatFactoryTest {
     configs.put(SCHEMA_NAME.key(), MY_SCHEMA_NAME);
     configs.put(AWS_REGION.key(), AWS_REGION.defaultValue());
 
-    final DebeziumAvroGlueDeserializationSchema expectedDeser = new DebeziumAvroGlueDeserializationSchema(
-        ROW_TYPE,
-        InternalTypeInfo.of(ROW_TYPE),
-        MY_SCHEMA_NAME,
-        configs);
-    final DynamicTableSource actualSource = FactoryMocks.createTableSource(SCHEMA,
-        getDefaultOptions());
+    final DebeziumAvroGlueDeserializationSchema expectedDeser =
+        new DebeziumAvroGlueDeserializationSchema(
+            ROW_TYPE, InternalTypeInfo.of(ROW_TYPE), MY_SCHEMA_NAME, configs);
+    final DynamicTableSource actualSource =
+        FactoryMocks.createTableSource(SCHEMA, getDefaultOptions());
 
     assertThat(actualSource).isInstanceOf(TestDynamicTableFactory.DynamicTableSourceMock.class);
 
-    TestDynamicTableFactory.DynamicTableSourceMock scanSourceMock = (TestDynamicTableFactory.DynamicTableSourceMock) actualSource;
-    DeserializationSchema<RowData> actualDeser = scanSourceMock.valueFormat.createRuntimeDecoder(
-        ScanRuntimeProviderContext.INSTANCE, SCHEMA.toPhysicalRowDataType());
+    TestDynamicTableFactory.DynamicTableSourceMock scanSourceMock =
+        (TestDynamicTableFactory.DynamicTableSourceMock) actualSource;
+    DeserializationSchema<RowData> actualDeser =
+        scanSourceMock.valueFormat.createRuntimeDecoder(
+            ScanRuntimeProviderContext.INSTANCE, SCHEMA.toPhysicalRowDataType());
 
     assertThat(actualDeser).isEqualTo(expectedDeser);
   }
@@ -66,18 +65,17 @@ class DebeziumAvroGlueFormatFactoryTest {
     configs.put(SCHEMA_NAME.key(), MY_SCHEMA_NAME);
     configs.put(AWS_REGION.key(), AWS_REGION.defaultValue());
 
-    final SerializationSchema<RowData> expectedSer = new DebeziumAvroGlueSerializationSchema(
-        ROW_TYPE,
-        MY_SCHEMA_NAME,
-        configs);
+    final SerializationSchema<RowData> expectedSer =
+        new DebeziumAvroGlueSerializationSchema(ROW_TYPE, MY_SCHEMA_NAME, configs);
     final DynamicTableSink actualSink = FactoryMocks.createTableSink(SCHEMA, getDefaultOptions());
 
     assertThat(actualSink).isInstanceOf(TestDynamicTableFactory.DynamicTableSinkMock.class);
 
-    TestDynamicTableFactory.DynamicTableSinkMock sinkMock = (TestDynamicTableFactory.DynamicTableSinkMock) actualSink;
+    TestDynamicTableFactory.DynamicTableSinkMock sinkMock =
+        (TestDynamicTableFactory.DynamicTableSinkMock) actualSink;
 
-    SerializationSchema<RowData> actualSer = sinkMock.valueFormat.createRuntimeEncoder(null,
-        SCHEMA.toPhysicalRowDataType());
+    SerializationSchema<RowData> actualSer =
+        sinkMock.valueFormat.createRuntimeEncoder(null, SCHEMA.toPhysicalRowDataType());
 
     assertThat(actualSer).isEqualTo(expectedSer);
   }

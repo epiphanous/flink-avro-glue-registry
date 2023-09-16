@@ -19,9 +19,12 @@ public class DebeziumAvroGlueFormatFactory extends AbstractAvroGlueFormatFactory
 
   @Override
   protected ChangelogMode changelogMode() {
-    return ChangelogMode.newBuilder().addContainedKind(RowKind.INSERT)
-        .addContainedKind(RowKind.UPDATE_BEFORE).addContainedKind(RowKind.UPDATE_AFTER)
-        .addContainedKind(RowKind.DELETE).build();
+    return ChangelogMode.newBuilder()
+        .addContainedKind(RowKind.INSERT)
+        .addContainedKind(RowKind.UPDATE_BEFORE)
+        .addContainedKind(RowKind.UPDATE_AFTER)
+        .addContainedKind(RowKind.DELETE)
+        .build();
   }
 
   @Override
@@ -35,14 +38,17 @@ public class DebeziumAvroGlueFormatFactory extends AbstractAvroGlueFormatFactory
   }
 
   @Override
-  protected DeserializationSchema<RowData> getDeserializationSchema(RowType rowType,
-      TypeInformation<RowData> rowDataTypeInfo, String schemaName, Map<String, Object> configs) {
+  protected DeserializationSchema<RowData> getDeserializationSchema(
+      RowType rowType,
+      TypeInformation<RowData> rowDataTypeInfo,
+      String schemaName,
+      Map<String, Object> configs) {
     return new DebeziumAvroGlueDeserializationSchema(rowType, rowDataTypeInfo, schemaName, configs);
   }
 
   @Override
-  protected SerializationSchema<RowData> getSerializationSchema(RowType rowType, String schemaName,
-      String topic, Map<String, Object> configs) {
+  protected SerializationSchema<RowData> getSerializationSchema(
+      RowType rowType, String schemaName, String topic, Map<String, Object> configs) {
     return new DebeziumAvroGlueSerializationSchema(rowType, schemaName, configs);
   }
 }

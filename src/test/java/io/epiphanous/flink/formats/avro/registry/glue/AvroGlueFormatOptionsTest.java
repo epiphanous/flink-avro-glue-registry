@@ -10,7 +10,8 @@ class AvroGlueFormatOptionsTest {
   @Test
   void dotCase() {
     assertThat(
-        AvroGlueFormatOptions.dotCase(AWSSchemaRegistryConstants.SCHEMA_NAMING_GENERATION_CLASS))
+            AvroGlueFormatOptions.dotCase(
+                AWSSchemaRegistryConstants.SCHEMA_NAMING_GENERATION_CLASS))
         .isEqualTo("schema.name.generation.class");
   }
 }
