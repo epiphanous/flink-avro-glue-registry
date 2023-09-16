@@ -1,58 +1,59 @@
 package io.epiphanous.flink.formats.avro.registry.glue.debezium;
 
+import static io.epiphanous.flink.formats.avro.registry.glue.debezium.DebeziumAvroUtils.createDebeziumAvroRowType;
+import static java.lang.String.format;
+import static org.apache.flink.table.types.utils.TypeConversions.fromLogicalToDataType;
+
+import io.epiphanous.flink.formats.avro.registry.glue.GlueAvroSerializationSchema;
+import java.util.Map;
+import java.util.Objects;
+import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericRecord;
 import org.apache.flink.annotation.Internal;
 import org.apache.flink.annotation.VisibleForTesting;
 import org.apache.flink.api.common.serialization.SerializationSchema;
 import org.apache.flink.formats.avro.AvroRowDataSerializationSchema;
 import org.apache.flink.formats.avro.RowDataToAvroConverters;
 import org.apache.flink.formats.avro.typeutils.AvroSchemaConverter;
-import org.apache.flink.table.api.DataTypes;
 import org.apache.flink.table.data.GenericRowData;
 import org.apache.flink.table.data.RowData;
 import org.apache.flink.table.data.StringData;
-import org.apache.flink.table.types.DataType;
 import org.apache.flink.table.types.logical.RowType;
 import org.apache.flink.types.RowKind;
-import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericRecord;
-
-import java.util.Map;
-import java.util.Objects;
-
-import static java.lang.String.format;
-import static org.apache.flink.table.types.utils.TypeConversions.fromLogicalToDataType;
-import io.epiphanous.flink.formats.avro.registry.glue.GlueAvroSerializationSchema;
 
 /**
- * Serialization schema from Flink Table/SQL internal data structure
- * {@link RowData} to Debezium
+ * Serialization schema from Flink Table/SQL internal data structure {@link RowData} to Debezium
  * Avro.
  */
 @Internal
 public class DebeziumAvroGlueSerializationSchema implements SerializationSchema<RowData> {
+
   private static final long serialVersionUID = 1L;
 
-  /** insert operation. */
+  /**
+   * insert operation.
+   */
   private static final StringData OP_INSERT = StringData.fromString("c");
-  /** delete operation. */
+  /**
+   * delete operation.
+   */
   private static final StringData OP_DELETE = StringData.fromString("d");
 
-  /** The deserializer to deserialize Debezium Avro data. */
+  /**
+   * The deserializer to deserialize Debezium Avro data.
+   */
   private final AvroRowDataSerializationSchema avroSerializer;
 
   private transient GenericRowData outputReuse;
 
-  public DebeziumAvroGlueSerializationSchema(
-      RowType rowType,
-      String topic,
+  public DebeziumAvroGlueSerializationSchema(RowType rowType, String topic,
       Map<String, Object> config) {
     RowType debeziumAvroRowType = createDebeziumAvroRowType(fromLogicalToDataType(rowType));
     Schema schema = AvroSchemaConverter.convertToSchema(debeziumAvroRowType);
-    SerializationSchema<GenericRecord> nestedSchema = GlueAvroSerializationSchema.forGeneric(schema, topic, config);
+    SerializationSchema<GenericRecord> nestedSchema = GlueAvroSerializationSchema.forGeneric(schema,
+        topic, config);
 
-    this.avroSerializer = new AvroRowDataSerializationSchema(
-        debeziumAvroRowType,
-        nestedSchema,
+    this.avroSerializer = new AvroRowDataSerializationSchema(debeziumAvroRowType, nestedSchema,
         RowDataToAvroConverters.createConverter(debeziumAvroRowType));
   }
 
@@ -60,6 +61,7 @@ public class DebeziumAvroGlueSerializationSchema implements SerializationSchema<
   DebeziumAvroGlueSerializationSchema(AvroRowDataSerializationSchema avroSerializer) {
     this.avroSerializer = avroSerializer;
   }
+
 
   @Override
   public void open(InitializationContext context) throws Exception {
@@ -86,9 +88,7 @@ public class DebeziumAvroGlueSerializationSchema implements SerializationSchema<
           return avroSerializer.serialize(outputReuse);
         default:
           throw new UnsupportedOperationException(
-              format(
-                  "Unsupported operation '%s' for row kind.",
-                  rowData.getRowKind()));
+              format("Unsupported operation '%s' for row kind.", rowData.getRowKind()));
       }
     } catch (Throwable t) {
       throw new RuntimeException(format("Could not serialize row '%s'.", rowData), t);
@@ -110,15 +110,5 @@ public class DebeziumAvroGlueSerializationSchema implements SerializationSchema<
   @Override
   public int hashCode() {
     return Objects.hash(avroSerializer);
-  }
-
-  public static RowType createDebeziumAvroRowType(DataType dataType) {
-    // Debezium Avro contains other information, e.g. "source", "ts_ms"
-    // but we don't need them
-    return (RowType) DataTypes.ROW(
-        DataTypes.FIELD("before", dataType.nullable()),
-        DataTypes.FIELD("after", dataType.nullable()),
-        DataTypes.FIELD("op", DataTypes.STRING()))
-        .getLogicalType();
   }
 }
