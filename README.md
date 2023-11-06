@@ -47,7 +47,7 @@ CREATE TABLE user_created (
   'format'                   = 'avro-glue',
   'avro-glue.schemaName'     = 'org.example.avro.UserEvent'
   'avro-glue.region'         = 'us-east-1',
-  'avro-glue.registry'       = 'my-glue-registry',
+  'avro-glue.registry.name'  = 'my-glue-registry',
   'avro-glue.transport.name' = 'user_events'
 )
 ```
@@ -88,7 +88,7 @@ CREATE TABLE user_created (
   'format'                   = 'debezium-avro-glue',
   'avro-glue.schemaName'     = 'org.example.avro.UserEvent'
   'avro-glue.region'         = 'us-east-1',
-  'avro-glue.registry'       = 'my-glue-registry',
+  'avro-glue.registry.name'  = 'my-glue-registry',
   'avro-glue.transport.name' = 'user_events'
 )
 ```
